@@ -1,23 +1,29 @@
 import ra_framework from "./framework";
 
 const config = {
-	debug: true,
-	hotjar: true,
-	pageLoad: false,
-	abtest: {
-		testId: "ra-framework-000",
-		testName: "SiteWide - Another Awesome Test Name Here",
-		variationId: "B",
-		variation: "Variant 1"
+	experiment: {
+		id: "ra-framework-000",
+		name: "SiteWide - Another Awesome Test Name Here",
+		variation: {
+			id: "B",
+			name: "Variant 1"
+		},
 	},
-	eventTrackerConfig: [{
-		selector: "h1",
+	debug: true,
+	devices: {
+		mobile: true,
+		desktop: true
+	},
+	hotjar: true,
+	pageLoad: true,
+	eventTrackerElements: [{
+		selector: ".container h1",
 		tag: "title",
 		events: ["mousedown", "touchend"],
 		throttle: 500,
 		first: true
 	}],
-	intersectionObserverConfig: [{
+	intersectionObserverElements: [{
 		selector: "h1",
 		tag: "title",
 		threshold: 1,
@@ -30,8 +36,6 @@ const config = {
 const framework = new ra_framework(config);
 
 framework.init(() => {
-
-	framework.logger.log("up and running!");
 
 	framework.utils.awaitNode({
 		selector: "p.elliot",
@@ -46,7 +50,7 @@ framework.init(() => {
 		} catch (error) {
 			framework.logger.error("an error occurred", error);
 		} finally {
-			document.body.classList.add(`${config.abtest.testId + config.abtest.variationId}`);
+			window.dispatchEvent(new Event("raExperimentLoaded"));
 		}
 	});
 

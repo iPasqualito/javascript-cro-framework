@@ -1,23 +1,35 @@
 import ra_logger from "./components/logger";
 import ra_utils from "./components/utils";
 import ra_observers from "./components/observers";
+import ra_trackers from "./components/trackers";
 
 const ra_framework = function(config) {
 
 	console.log("framework running, config:", config);
 
 	const logger = new ra_logger({
-		test: config.abtest,
+		experiment: config.experiment,
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug
 	});
 	const utils = new ra_utils(logger);
-	// todo this should be added to git
+	const trackers = new ra_trackers(logger, {
+		experiment: config.experiment,
+		hotjar: config.hotjar,
+		pageLoad: config.pageLoad,
+		etc: config.eventTrackerElements,
+		ioc: config.intersectionObserverElements
+	});
 
 	return {
-		init: (callback) => {
-			if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
-			logger.info("Init: framework start");
+		init: callback => {
 			try {
+
+				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
+
+				logger.info("Init: framework start");
+
+				trackers.track();
+
 				if(typeof callback === "function") callback.call();
 			}
 			catch(e) {

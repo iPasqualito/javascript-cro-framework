@@ -1,10 +1,11 @@
 const ra_logger = function (params) {
+
 	let logStack = [],
 		kickOff = performance.now(),
 		config = {
 			debug: params.debug,
 			flushed: false,
-			testId: params.test.testId + params.test.variationId,
+			testId: params.experiment.id + params.experiment.variation.id,
 			_style: {
 				logCSS: "color:#28a745;",
 				infoCSS: "color:#17a2b8;",

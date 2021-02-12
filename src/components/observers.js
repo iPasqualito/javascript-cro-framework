@@ -21,7 +21,7 @@ const ra_observers = function (logger) {
 						for (let node of nodeList) {
 							if (node.classList.contains(params.childClass)) {
 								logger.log("observeMutations: " + (added ? "added " : "removed ") + "element:", node);
-								params.callbackfn(mutation);
+								params.callback(mutation);
 							}
 						}
 						break;
@@ -29,13 +29,13 @@ const ra_observers = function (logger) {
 						const mtParent = mutation.target.parentElement;
 						if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === params.childName) {
 							logger.log("observeMutations: element characterData changed from " + mutation.oldValue + " to " + mtParent.nodeValue, mutation);
-							params.callbackfn(mutation);
+							params.callback(mutation);
 						}
 						break;
 					case "attributes":
 						if (getNode(children, mutation.target)) {
 							logger.log("observeMutations: element " + mutation.attributeName + " attribute changed from " + mutation.oldValue + " to " + mutation.target.getAttribute(params.attributeName));
-							params.callbackfn(mutation);
+							params.callback(mutation);
 						}
 						break;
 					default:
@@ -59,8 +59,6 @@ const ra_observers = function (logger) {
 			logger.info("observeMutations: ready, observing...");
 		},
 		observeIntersections: function (params) {
-			const sendDim = this.sendDimension;
-			let disconnect = false;
 			logger.info("observeIntersections: start", params);
 			params.forEach(function (param) {
 				document.querySelectorAll(param.selector).forEach(function (element) {
@@ -68,19 +66,11 @@ const ra_observers = function (logger) {
 					const observer = new IntersectionObserver(function (entries) {
 						entries.forEach(function (entry) {
 							if (entry.isIntersecting) {
-								if (typeof param.inCallback === "function") {
-									param.inCallback.call(entry);
-								} else {
-									sendDim(`Viewport hit for element ${param.tag}`);
-								} // only disconnect after CB call or sendDimension
-								if (param.once) disconnect = true
+								if (typeof param.inCallback === "function") param.inCallback.call(entry);
 							} else {
-								if (typeof param.outCallback === "function") {
-									param.outCallback.call(entry);
-									if (param.once) disconnect = true
-								}
+								if (typeof param.outCallback === "function") param.outCallback.call(entry);
 							}
-							if (disconnect) {
+							if (param.once) {
 								logger.log("observeIntersections: disconnecting, goodbye.");
 								observer.unobserve(element);
 							}
