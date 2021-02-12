@@ -13,9 +13,10 @@ const ra_framework = function(config) {
 	});
 	const utils = new ra_utils(logger);
 	const trackers = new ra_trackers(logger, {
-		experiment: config.experiment,
-		hotjar: config.hotjar,
-		pageLoad: config.pageLoad,
+		exp: config.experiment,
+		htj: config.hotjar,
+		mob: config.devices.mobile,
+		pld: config.pageLoad,
 		etc: config.eventTrackerElements,
 		ioc: config.intersectionObserverElements
 	});
@@ -26,13 +27,13 @@ const ra_framework = function(config) {
 
 				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
 
-				logger.info("Init: framework start");
+				const isMobile = utils.isMobile();
 
-				if(config.devices.desktop || (config.devices.mobile && utils.isMobile())) {
+				if((config.devices.desktop && !isMobile) || (config.devices.mobile && isMobile)) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
-					logger.error("device conditions not met");
+					logger.error("Init: device conditions not met");
 				}
 
 			}
