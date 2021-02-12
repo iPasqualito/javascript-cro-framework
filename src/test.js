@@ -2,8 +2,8 @@ import ra_framework from "./framework";
 
 const config = {
 	experiment: {
-		id: "ra-framework-000",
-		name: "SiteWide - Another Awesome Test Name Here",
+		id: "ra-000",
+		name: "SiteWide - CRO Framework",
 		variation: {
 			id: "B",
 			name: "Variant 1"

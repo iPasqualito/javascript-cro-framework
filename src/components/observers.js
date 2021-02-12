@@ -56,7 +56,6 @@ const ra_observers = function (logger) {
 				}
 			});
 			observer.observe(params.parent, params.config);
-			logger.info("observeMutations: ready, observing...");
 		},
 		observeIntersections: function (element) {
 			logger.info("observeIntersections", element);
@@ -70,7 +69,7 @@ const ra_observers = function (logger) {
 							if (typeof element.outCallback === "function") element.outCallback.call(entry);
 						}
 						if (element.once) {
-							logger.log("observeIntersections: disconnecting, goodbye.");
+							logger.log("observeIntersections: disconnecting.");
 							observer.unobserve(e);
 						}
 					});
@@ -81,7 +80,6 @@ const ra_observers = function (logger) {
 				});
 				observer.observe(e);
 			});
-			logger.info("observeIntersections: ready");
 		}
 	}
 

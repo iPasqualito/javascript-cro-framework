@@ -3,7 +3,7 @@ import ra_utils from "./components/utils";
 import ra_observers from "./components/observers";
 import ra_trackers from "./components/trackers";
 
-const ra_framework = function(config) {
+window.ra_framework = function(config) {
 
 	const logger = new ra_logger({
 		experiment: config.experiment,
@@ -22,6 +22,8 @@ const ra_framework = function(config) {
 	return {
 		init: callback => {
 			try {
+
+				logger.info("init: start", config);
 
 				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
 

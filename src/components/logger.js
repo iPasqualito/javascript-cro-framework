@@ -15,7 +15,7 @@ const ra_logger = function (params) {
 		},
 		timeStamp = () => ((performance.now() - kickOff) / 1000).toFixed(3),
 		printRow = function (ts, type, msg, obj) {
-			let css = "font-family:roboto;font-size:12px;padding:5px 0;";
+			let css = "font-family:roboto;font-size:12px;padding:5px 0;font-weight:bold;";
 			switch (type) {
 				case "log":
 					css += config._style.logCSS;

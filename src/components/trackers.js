@@ -12,7 +12,7 @@ const ra_trackers = function (logger, config) {
 			eventAction: eventAction,
 			eventLabel: `${config.exp.variation.id}: ${config.exp.variation.name}`,
 			eventNonInteraction: eventNonInteraction // if not sent default to true
-		}); //edgy!
+		});
 	};
 
 	const triggerHotjar = function () {

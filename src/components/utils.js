@@ -2,7 +2,7 @@ const ra_utils = function(logger) {
 
 	return {
 		awaitNode: (parameters, callback) => {
-			logger.log("awaitNode", [parameters, callback]);
+			logger.info("awaitNode", [parameters, callback]);
 			try {
 				new MutationObserver(function (mutation, observer) {
 					let className = typeof parameters.className !== "undefined" ? parameters.className : "ra-framework-found",
@@ -39,7 +39,7 @@ const ra_utils = function(logger) {
 			logger.info("addStyle", [css.replace(/(\r\n|\n|\r|\t)/gm,""), id]);
 			try {
 				if (document.getElementById(id)) {
-					logger.info("addStyle: StyleSheet already exists in DOM");
+					logger.log("addStyle: StyleSheet already exists in DOM");
 				} else {
 					const head = document.head || document.getElementsByTagName("head")[0];
 					const link = this.addNode('style', {
