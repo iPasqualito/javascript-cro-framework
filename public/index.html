@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>recoveryArea Framework Test Page</title>
+	<link rel="stylesheet" href="../src/scss/app.scss"/>
+	<script src="../src/test.js"></script>
+</head>
+<body>
+<div class="container">
+	<h1>recoveryArea Framework Test Page</h1>
+	<script>
+		setTimeout(() => {
+			const element = document.createElement("p");
+			element.innerText = "Hey Elliot hoe awesome vind je dit?";
+			element.classList.add("elliot");
+			element.style.fontSize = "1em";
+			document.querySelector(".container").appendChild(element);
+		}, 1500);
+	</script>
+</div>
+</body>
+</html>
