@@ -18,7 +18,7 @@ const config = {
 	pageLoad: false,
 	eventTrackerElements: [{
 		selector: ".container h1",
-		tag: "title",
+		tag: "click on title element",
 		events: ["mousedown", "touchend"],
 		throttle: 500,
 		first: true
@@ -53,7 +53,7 @@ framework.init(() => {
 		const secondElement = framework.utils.addNode("p", {
 			"class": "elliot new"
 		});
-		secondElement.innerText = "Nou ja zeg dit is ook al zo cool...";
+		secondElement.innerText = "Daarom ben ik toegevoegd...";
 		element.insertAdjacentElement("afterend", secondElement);
 	}
 

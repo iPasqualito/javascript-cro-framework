@@ -5,7 +5,7 @@ const ra_trackers = function (logger, config) {
 	const observers = new ra_observers(logger);
 
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
-		logger.info("sendDimension", eventAction);
+		logger.info("sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
 			eventCategory: `${config.exp.id}: ${config.exp.name}`,
@@ -67,7 +67,7 @@ const ra_trackers = function (logger, config) {
 
 		element.events.forEach(e => {
 			try {
-				logger.log(`trackElements: ${e} eventlistener starting for`, element.tag);
+				logger.log(`trackElements: ${e} eventListener starting for`, element.tag);
 				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
 			} catch (error) {
 				errorStack.push[error];
@@ -84,7 +84,7 @@ const ra_trackers = function (logger, config) {
 
 	const setSwipeEvents = function (t = window, e = document) {
 		logger.info("setSwipeEvents");
-
+		// <script src="https://gist.github.com/honsa/35282fa386fe5624e3b0502496c9974a.js"></script>
 		try {
 			"function" != typeof t.CustomEvent && (t.CustomEvent = function (t, n) {
 				n = n || {bubbles: !1, cancelable: !1, detail: void 0};
@@ -125,17 +125,17 @@ const ra_trackers = function (logger, config) {
 				if (config.pld) {
 					sendDimension("Page Load Event");
 				} else {
-					logger.info("track: pageLoad event not set");
+					logger.warn("track: pageLoad event not set");
 				}
 				if (config.htj) {
 					triggerHotjar();
 				} else {
-					logger.info("track: hotjar not set");
+					logger.warn("track: hotjar not set");
 				}
 				if (config.etc && config.etc.length) {
 					config.etc.forEach(e => trackElements(e));
 				} else {
-					logger.info("track: eventTrackerElements not set");
+					logger.warn("track: eventTrackerElements not set");
 				}
 				if (config.ioc && config.ioc.length) {
 					config.ioc.forEach(e => observers.observeIntersections({
@@ -145,7 +145,7 @@ const ra_trackers = function (logger, config) {
 						}
 					}));
 				} else {
-					logger.info("track: intersectionObserverElements not set");
+					logger.warn("track: intersectionObserverElements not set");
 				}
 			});
 		}
