@@ -37,6 +37,26 @@ const framework = new ra_framework(config);
 
 framework.init(() => {
 
+	const changeDom = element => {
+
+		framework.utils.addStyle(`
+			p.elliot.new {
+				font-size: 1em;
+				border: 1px solid white;
+				border-radius:5px;
+				margin-top: 24px;
+				padding: 12px 48px;
+			}
+		`, `ra-cro-style`);
+
+		framework.logger.info("element loaded", element);
+		const secondElement = framework.utils.addNode("p", {
+			"class": "elliot new"
+		});
+		secondElement.innerText = "Nou ja zeg dit is ook al zo cool...";
+		element.insertAdjacentElement("afterend", secondElement);
+	}
+
 	framework.utils.awaitNode({
 		selector: "p.elliot",
 		tag: "elliot paragraaf",
@@ -46,7 +66,7 @@ framework.init(() => {
 		disconnect: true
 	}, element => {
 		try {
-			framework.logger.info("element loaded", element);
+			changeDom(element);
 		} catch (error) {
 			framework.logger.error("an error occurred", error);
 		} finally {

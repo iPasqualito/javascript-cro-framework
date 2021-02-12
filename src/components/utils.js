@@ -8,12 +8,9 @@ const ra_utils = function(logger) {
 					let className = typeof parameters.className !== "undefined" ? parameters.className : "ra-framework-found",
 						el = document.querySelector(`${parameters.selector}:not(.${className})`);
 					if (el) {
-						logger.log("awaitNode: element found", parameters.tag);
+						logger.log(`awaitNode: element found${parameters.disconnect ? ", done." : "."}`, parameters.tag);
 						el.classList.add(className);
-						if (parameters.disconnect) {
-							logger.log("awaitNode: disconnecting, goodbye.");
-							observer.disconnect();
-						}
+						if (parameters.disconnect) observer.disconnect();
 						if (typeof callback === "function") callback(el);
 					}
 				}).observe(parameters.parent || document.body, {
@@ -59,11 +56,11 @@ const ra_utils = function(logger) {
 			}
 		},
 		setAttributes: function (e, a) {
-			logger.info("setAttributes: start");
+			logger.info("setAttributes", e, a);
 			Object.entries(a).map(([key, value]) => e.setAttribute(key, value));
 		},
 		editQueryParam: function (parameters) {
-			logger.info("editQueryParam: start", parameters);
+			logger.info("editQueryParam", parameters);
 			let url = new URL(document.location.href),
 				spms = new URLSearchParams(url.search);
 			for (let key in parameters) {

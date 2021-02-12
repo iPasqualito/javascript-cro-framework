@@ -28,15 +28,19 @@ const ra_framework = function(config) {
 
 				logger.info("Init: framework start");
 
-				trackers.track();
+				if(config.devices.desktop || (config.devices.mobile && utils.isMobile())) {
+					trackers.track();
+					if(typeof callback === "function") callback.call();
+				} else {
+					logger.error("device conditions not met");
+				}
 
-				if(typeof callback === "function") callback.call();
 			}
 			catch(e) {
 				logger.error("Init: fail", e);
 			}
 			finally {
-				logger.log("init: all ready");
+				logger.log("init: done");
 			}
 		},
 		logger: logger,

@@ -5,7 +5,7 @@ const ra_trackers = function (logger, config) {
 	const observers = new ra_observers(logger);
 
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
-		logger.info("sendDimension: start", eventAction);
+		logger.info("sendDimension", eventAction);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
@@ -16,7 +16,7 @@ const ra_trackers = function (logger, config) {
 	};
 
 	const triggerHotjar = function () {
-		logger.info("triggerHotjar: start", config.experiment.id + config.experiment.variation.id);
+		logger.info("triggerHotjar", config.experiment.id + config.experiment.variation.id);
 		window.hj = window.hj || function () {
 			(window.hj.q = window.hj.q || []).push(arguments);
 		};
@@ -58,7 +58,7 @@ const ra_trackers = function (logger, config) {
 				}
 			};
 		};
-		logger.info("trackElements: start", elements);
+		logger.info("trackElements", elements);
 		elements.forEach(function (element) {
 			try {
 				element.events.forEach(e => {

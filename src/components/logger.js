@@ -44,12 +44,12 @@ const ra_logger = function (params) {
 				}
 			} else {
 				if (typeof obj === "object") {
-					console.log("%c [" + ts + "s] " + config.testId + " %s: %o", css, msg, obj);
+					console.log("%c [" + ts + "s] " + config.testId + " %s %o", css, msg, obj);
 				} else {
 					if (typeof obj === "number") {
-						console.log("%c [" + ts + "s] " + config.testId + " %s: %f", css, msg, obj);
+						console.log("%c [" + ts + "s] " + config.testId + " %s %f", css, msg, obj);
 					} else {
-						console.log("%c [" + ts + "s] " + config.testId + " %s: %s", css, msg, obj);
+						console.log("%c [" + ts + "s] " + config.testId + " %s %s", css, msg, obj);
 					}
 				}
 			}
