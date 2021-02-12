@@ -5,8 +5,6 @@ import ra_trackers from "./components/trackers";
 
 const ra_framework = function(config) {
 
-	console.log("framework running, config:", config);
-
 	const logger = new ra_logger({
 		experiment: config.experiment,
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug
@@ -45,7 +43,9 @@ const ra_framework = function(config) {
 			}
 		},
 		logger: logger,
-		utils: utils
+		utils: utils,
+		observers: new ra_observers(logger),
+		track: trackers.sendDimension
 	}
 
 }

@@ -2,7 +2,7 @@ const ra_observers = function (logger) {
 
 	return {
 		observeMutations: function (params) {
-			logger.info("observeMutations start", params);
+			logger.info("observeMutations", params);
 			const handleMutation = function (mutation) {
 				let nodeList = [],
 					added = false,
@@ -58,30 +58,28 @@ const ra_observers = function (logger) {
 			observer.observe(params.parent, params.config);
 			logger.info("observeMutations: ready, observing...");
 		},
-		observeIntersections: function (params) {
-			logger.info("observeIntersections: start", params);
-			params.forEach(function (param) {
-				document.querySelectorAll(param.selector).forEach(function (element) {
-					logger.log("observeIntersections: observer starting for", element);
-					const observer = new IntersectionObserver(function (entries) {
-						entries.forEach(function (entry) {
-							if (entry.isIntersecting) {
-								if (typeof param.inCallback === "function") param.inCallback.call(entry);
-							} else {
-								if (typeof param.outCallback === "function") param.outCallback.call(entry);
-							}
-							if (param.once) {
-								logger.log("observeIntersections: disconnecting, goodbye.");
-								observer.unobserve(element);
-							}
-						});
-					}, {
-						root: param.root,
-						rootMargin: param.rootMargin,
-						threshold: param.threshold
+		observeIntersections: function (element) {
+			logger.info("observeIntersections", element);
+			document.querySelectorAll(element.selector).forEach(function (e) {
+				logger.log("observeIntersections: observer starting for", e);
+				const observer = new IntersectionObserver(function (entries) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting) {
+							if (typeof element.inCallback === "function") element.inCallback.call(entry);
+						} else {
+							if (typeof element.outCallback === "function") element.outCallback.call(entry);
+						}
+						if (element.once) {
+							logger.log("observeIntersections: disconnecting, goodbye.");
+							observer.unobserve(e);
+						}
 					});
-					observer.observe(element);
+				}, {
+					root: element.root,
+					rootMargin: element.rootMargin,
+					threshold: element.threshold
 				});
+				observer.observe(e);
 			});
 			logger.info("observeIntersections: ready");
 		}

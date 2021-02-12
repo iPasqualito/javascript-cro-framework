@@ -23,52 +23,57 @@ const ra_trackers = function (logger, config) {
 		window.hj("trigger", config.exp.id + config.exp.variation.id);
 	};
 
-	const trackElements = function (elements) {  // courtesy of Michiel Kikkert, @Dutch_Guy
+	const trackElements = function (element) {  // courtesy of Michiel Kikkert, @Dutch_Guy
 
 		const errorStack = [];
 
-		const handlerFactory = function (element) {
+		const handlerFactory = function (el) {
 			let counter = 0,
 				threshold = 0;
 			return function (event) {
 				let currentTime = performance.now(),
 					found = false,
-					_selectors = document.querySelectorAll(element.selector);
+					_selectors = document.querySelectorAll(el.selector);
+
+				logger.log("currentTime", currentTime);
+
 				_selectors.forEach(function (_selector) {
-					if (_selector !== null && element.events.includes(event.type) && (event.target.matches(element.selector) || _selector.contains(event.target))) {
+					if (_selector !== null && el.events.includes(event.type) && (event.target.matches(el.selector) || _selector.contains(event.target))) {
 						found = true;
 					}
 				});
 				if (!found) return;
 				if (threshold === 0) {
-					threshold = performance.now() + element.throttle;
-					if (element.first) {
+					threshold = performance.now() + el.throttle;
+					logger.log("threshold", threshold);
+					if (el.first) {
 						execute();
-						element.first = false;
+						el.first = false;
 					}
 				}
+
 				if (threshold > currentTime) return;
 				threshold = 0;
 				execute();
 
 				function execute() {
 					counter++;
-					logger.log("handlerFactory: custom event #" + counter + " tracked", element.tag + " [" + event.type + "]");
-					sendDimension(`${element.tag}`, false);
+					logger.log("handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
+					sendDimension(`${el.tag}`, false);
 				}
 			};
 		};
-		logger.info("trackElements", elements);
-		elements.forEach(function (element) {
+		logger.info("trackElements", element);
+
+		element.events.forEach(e => {
 			try {
-				element.events.forEach(e => {
-					logger.log(`trackElements: ${e} eventlistener starting for`, element.tag);
-					document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
-				});
+				logger.log(`trackElements: ${e} eventlistener starting for`, element.tag);
+				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
 			} catch (error) {
 				errorStack.push[error];
 			}
 		});
+
 		if (errorStack.length) {
 			errorStack.forEach((entry, i) => logger.error(`trackElements error ${i}`, entry));
 			sendDimension("trackElements failure: " + errorStack.length + " errors");
@@ -110,15 +115,38 @@ const ra_trackers = function (logger, config) {
 		sendDimension: sendDimension,
 		track: function () {
 
-			const windowLoaded = new Promise( resolve => window.addEventListener("load", resolve, false));
-			const experimentLoaded = new Promise( resolve => window.addEventListener("raExperimentLoaded", resolve, false));
+			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
+			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				if (config.mob) setSwipeEvents();
-				if (config.pld) sendDimension("Page Load Event");
-				if (config.htj) triggerHotjar();
-				if (config.etc) trackElements(config.etc);
-				if (config.ioc) observers.observeIntersections(config.ioc);
+				if (config.mob) {
+					setSwipeEvents();
+				}
+				if (config.pld) {
+					sendDimension("Page Load Event");
+				} else {
+					logger.info("track: pageLoad event not set");
+				}
+				if (config.htj) {
+					triggerHotjar();
+				} else {
+					logger.info("track: hotjar not set");
+				}
+				if (config.etc && config.etc.length) {
+					config.etc.forEach(e => trackElements(e));
+				} else {
+					logger.info("track: eventTrackerElements not set");
+				}
+				if (config.ioc && config.ioc.length) {
+					config.ioc.forEach(e => observers.observeIntersections({
+						...e,
+						inCallback: () => {
+							sendDimension(`intersection observed: ${e.tag}`)
+						}
+					}));
+				} else {
+					logger.info("track: intersectionObserverElements not set");
+				}
 			});
 		}
 	}

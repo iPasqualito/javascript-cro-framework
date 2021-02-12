@@ -14,8 +14,8 @@ const config = {
 		mobile: true,
 		desktop: true
 	},
-	hotjar: true,
-	pageLoad: true,
+	hotjar: false,
+	pageLoad: false,
 	eventTrackerElements: [{
 		selector: ".container h1",
 		tag: "title",
@@ -24,8 +24,8 @@ const config = {
 		first: true
 	}],
 	intersectionObserverElements: [{
-		selector: "h1",
-		tag: "title",
+		selector: "p.new",
+		tag: "new paragraph",
 		threshold: 1,
 		root: null,
 		rootMargin: "0px",
@@ -72,6 +72,7 @@ framework.init(() => {
 		} finally {
 			window.dispatchEvent(new Event("raExperimentLoaded"));
 		}
+
 	});
 
 });
