@@ -2,46 +2,58 @@ const ra_observers = function (logger) {
 
 	return {
 		observeMutations: function (params) {
+
 			logger.info("observeMutations", params);
+
 			const handleMutation = function (mutation) {
 				let nodeList = [],
-					added = false,
 					parent = params.parent,
 					children = parent.querySelectorAll(params.childName + (typeof params.childClass !== "undefined" ? "." + params.childClass : ""));
-				const getNodeList = nodes => Array.from(nodes).filter(node => (node.nodeType !== 3 && node.nodeType !== 8 && node.localName.toLowerCase() === params.childName.toLowerCase())),// we are only interested in nodes with the same tag name.
-					getNode = (haystack, needle) => Array.from(haystack).includes(needle);// does the children collection contain the mutation target?
+				const getNodeList = nodes => Array.from(nodes).filter(node => (node.nodeType !== 3 && node.nodeType !== 8 && node.localName.toLowerCase() === params.childName.toLowerCase()));// we are only interested in nodes with the same tag name.
+				const getNode = (haystack, needle) => Array.from(haystack).includes(needle);// does the children collection contain the mutation target?
+
+				const handleChildList = mutation => {
+					if (mutation.addedNodes.length) {
+						nodeList = getNodeList(mutation.addedNodes);
+					} else if (mutation.removedNodes.length) {
+						nodeList = getNodeList(mutation.removedNodes);
+					}
+					for (let node of nodeList) {
+						if (node.classList.contains(params.childClass)) {
+							logger.log("observeMutations: " + (mutation.addedNodes.length ? "added " : "removed ") + "element:", node);
+							params.callback(mutation.target);
+						}
+					}
+				};
+				const handleCharacterData = mutation => {
+					const mtParent = mutation.target.parentElement;
+					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === params.childName) {
+						logger.log("observeMutations: element characterData changed from " + mutation.oldValue + " to " + mtParent.nodeValue, mutation);
+						params.callback(mutation.target);
+					}
+				};
+				const handleAttributes = mutation => {
+					if (getNode(children, mutation.target)) {
+						logger.log("observeMutations: element " + mutation.attributeName + " attribute changed from " + mutation.oldValue + " to " + mutation.target.getAttribute(params.attributeName));
+						params.callback(mutation.target);
+					}
+				};
+
 				switch (mutation.type) {
 					case "childList":
-						if (mutation.addedNodes.length) {
-							added = true;
-							nodeList = getNodeList(mutation.addedNodes);
-						} else if (mutation.removedNodes.length) {
-							nodeList = getNodeList(mutation.removedNodes);
-						}
-						for (let node of nodeList) {
-							if (node.classList.contains(params.childClass)) {
-								logger.log("observeMutations: " + (added ? "added " : "removed ") + "element:", node);
-								params.callback(mutation.target);
-							}
-						}
+						handleChildList(mutation);
 						break;
 					case "characterData":
-						const mtParent = mutation.target.parentElement;
-						if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === params.childName) {
-							logger.log("observeMutations: element characterData changed from " + mutation.oldValue + " to " + mtParent.nodeValue, mutation);
-							params.callback(mutation.target);
-						}
+						handleCharacterData(mutation);
 						break;
 					case "attributes":
-						if (getNode(children, mutation.target)) {
-							logger.log("observeMutations: element " + mutation.attributeName + " attribute changed from " + mutation.oldValue + " to " + mutation.target.getAttribute(params.attributeName));
-							params.callback(mutation.target);
-						}
+						handleAttributes(mutation);
 						break;
 					default:
 						logger.log("observeMutations: I have never heard of that fruit...");
 				}
 			};
+
 			const observer = new MutationObserver(function (mutations) {
 				mutations.forEach(function (mutation) {
 					try {
@@ -55,6 +67,7 @@ const ra_observers = function (logger) {
 					observer.disconnect();
 				}
 			});
+
 			observer.observe(params.parent, params.config);
 		},
 		observeIntersections: function (element) {

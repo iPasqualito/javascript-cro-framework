@@ -1,6 +1,5 @@
 const ra_utils = (logger) => {
 
-
 	const addNode = (type, position, target, attrs) => {
 
 		logger.info("addNode", [type, attrs]);
