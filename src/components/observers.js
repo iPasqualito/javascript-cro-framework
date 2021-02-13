@@ -21,7 +21,7 @@ const ra_observers = function (logger) {
 						for (let node of nodeList) {
 							if (node.classList.contains(params.childClass)) {
 								logger.log("observeMutations: " + (added ? "added " : "removed ") + "element:", node);
-								params.callback(mutation);
+								params.callback(mutation.target);
 							}
 						}
 						break;
@@ -29,13 +29,13 @@ const ra_observers = function (logger) {
 						const mtParent = mutation.target.parentElement;
 						if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === params.childName) {
 							logger.log("observeMutations: element characterData changed from " + mutation.oldValue + " to " + mtParent.nodeValue, mutation);
-							params.callback(mutation);
+							params.callback(mutation.target);
 						}
 						break;
 					case "attributes":
 						if (getNode(children, mutation.target)) {
 							logger.log("observeMutations: element " + mutation.attributeName + " attribute changed from " + mutation.oldValue + " to " + mutation.target.getAttribute(params.attributeName));
-							params.callback(mutation);
+							params.callback(mutation.target);
 						}
 						break;
 					default:

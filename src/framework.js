@@ -2,6 +2,7 @@ import ra_logger from "./components/logger";
 import ra_utils from "./components/utils";
 import ra_observers from "./components/observers";
 import ra_trackers from "./components/trackers";
+import ra_storage from "./components/storage";
 
 window.ra_framework = function(config) {
 
@@ -14,8 +15,8 @@ window.ra_framework = function(config) {
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug
 	});
 
-	const utils = new ra_utils(logger);
 	const trackers = new ra_trackers(logger, config);
+	const utils = new ra_utils(logger);
 
 	return {
 		init: callback => {
@@ -44,8 +45,9 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
+		storage: new ra_storage(logger),
 		observers: new ra_observers(logger),
-		tracker: trackers.sendDimension
+		sendDimension: trackers.sendDimension
 	}
 
 }

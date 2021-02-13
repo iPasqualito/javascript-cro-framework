@@ -40,19 +40,19 @@
 		const changeDom = element => {
 
 			framework.utils.addStyle(`
-			p.elliot.new {
-				font-size: 1em;
-				border: 1px solid white;
-				border-radius:5px;
-				margin-top: 24px;
-				padding: 12px 48px;
-			}
-		`, `ra-cro-style`);
+				p.elliot.new {
+					font-size: 1em;
+					border: 1px solid white;
+					border-radius:5px;
+					margin-top: 24px;
+					padding: 12px 48px;
+				}
+			`, `ra-cro-style`);
 
 			framework.logger.info("element loaded", element);
 			framework.utils.addNode("p", "afterend", element, {
-				"class": "elliot new",
-				"innerText": "Daarom ben ik hier..."
+				class: "elliot new",
+				innerText: "Daarom ben ik hier..."
 			});
 		}
 
@@ -69,6 +69,7 @@
 			} catch (error) {
 				framework.logger.error("an error occurred", error);
 			} finally {
+				framework.sendDimension("Test code ran successfully");
 				w.dispatchEvent(new Event("raExperimentLoaded"));
 			}
 
