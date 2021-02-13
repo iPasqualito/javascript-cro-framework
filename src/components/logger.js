@@ -54,10 +54,8 @@ const ra_logger = function (cfg) {
 				}
 			}
 		},
-		printStack = function () {
-			for (let row of logStack) {
-				printRow(row.ts, row.type, row.msg, row.obj);
-			}
+		printStack = () => {
+			for (let row of logStack) printRow(row.ts, row.type, row.msg, row.obj);
 		},
 		process = function (timestamp, type, msg, obj) {
 			logStack.push({
@@ -77,18 +75,10 @@ const ra_logger = function (cfg) {
 		};
 	return {
 		printStack: printStack,
-		log: function (message, object) {
-			process(timeStamp(), "log", message, object);
-		},
-		info: function (message, object) {
-			process(timeStamp(), "info", message, object);
-		},
-		warn: function (message, object) {
-			process(timeStamp(), "warn", message, object);
-		},
-		error: function (message, object) {
-			process(timeStamp(), "error", message, object);
-		}
+		log: (message, object) => process(timeStamp(), "log", message, object),
+		info: (message, object) => process(timeStamp(), "info", message, object),
+		warn: (message, object) => process(timeStamp(), "warn", message, object),
+		error: (message, object) => process(timeStamp(), "error", message, object)
 	};
 };
 
