@@ -1,4 +1,6 @@
-const ra_utils = function(logger) {
+import logger from "../framework";
+
+const ra_utils = function() {
 
 	return {
 		awaitNode: (parameters, callback) => {

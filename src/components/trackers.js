@@ -1,6 +1,7 @@
 import ra_observers from "./observers";
+import {logger, globals} from "../framework";
 
-const ra_trackers = function (logger, config) {
+const ra_trackers = function () {
 
 	const observers = new ra_observers(logger);
 
@@ -8,19 +9,19 @@ const ra_trackers = function (logger, config) {
 		logger.info("sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
-			eventCategory: `${config.exp.id}: ${config.exp.name}`,
+			eventCategory: `${globals.experiment.id}: ${globals.experiment.name}`,
 			eventAction: eventAction,
-			eventLabel: `${config.exp.variation.id}: ${config.exp.variation.name}`,
+			eventLabel: `${globals.experiment.variation.id}: ${globals.experiment.variation.name}`,
 			eventNonInteraction: eventNonInteraction // if not sent default to true
 		});
 	};
 
 	const triggerHotjar = function () {
-		logger.info("triggerHotjar", config.exp.id + config.exp.variation.id);
+		logger.info("triggerHotjar", globals.experiment.id + globals.experiment.variation.id);
 		window.hj = window.hj || function () {
 			(window.hj.q = window.hj.q || []).push(arguments);
 		};
-		window.hj("trigger", config.exp.id + config.exp.variation.id);
+		window.hj("trigger", globals.experiment.id + globals.experiment.variation.id);
 	};
 
 	const trackElements = function (element) {  // courtesy of Michiel Kikkert, @Dutch_Guy
@@ -35,7 +36,7 @@ const ra_trackers = function (logger, config) {
 					found = false,
 					_selectors = document.querySelectorAll(el.selector);
 
-				logger.log("currentTime", currentTime);
+				//logger.log("currentTime", currentTime);
 
 				_selectors.forEach(function (_selector) {
 					if (_selector !== null && el.events.includes(event.type) && (event.target.matches(el.selector) || _selector.contains(event.target))) {
@@ -45,7 +46,7 @@ const ra_trackers = function (logger, config) {
 				if (!found) return;
 				if (threshold === 0) {
 					threshold = performance.now() + el.throttle;
-					logger.log("threshold", threshold);
+					//logger.log("threshold", threshold);
 					if (el.first) {
 						execute();
 						el.first = false;
@@ -119,26 +120,26 @@ const ra_trackers = function (logger, config) {
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				if (config.mob) {
+				if (globals.devices.mobile) {
 					setSwipeEvents();
 				}
-				if (config.pld) {
+				if (globals.pageLoad) {
 					sendDimension("Page Load Event");
 				} else {
 					logger.warn("track: pageLoad event not set");
 				}
-				if (config.htj) {
+				if (globals.hotjar) {
 					triggerHotjar();
 				} else {
 					logger.warn("track: hotjar not set");
 				}
-				if (config.etc && config.etc.length) {
-					config.etc.forEach(e => trackElements(e));
+				if (globals.eventTrackerElements && globals.eventTrackerElements.length) {
+					globals.eventTrackerElements.forEach(e => trackElements(e));
 				} else {
 					logger.warn("track: eventTrackerElements not set");
 				}
-				if (config.ioc && config.ioc.length) {
-					config.ioc.forEach(e => observers.observeIntersections({
+				if (globals.intersectionObserverElements && globals.intersectionObserverElements.length) {
+					globals.intersectionObserverElements.forEach(e => observers.observeIntersections({
 						...e,
 						inCallback: () => {
 							sendDimension(`intersection observed: ${e.tag}`)

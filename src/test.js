@@ -1,5 +1,3 @@
-import ra_framework from "./framework";
-
 const config = {
 	experiment: {
 		id: "ra-000",

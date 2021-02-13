@@ -1,4 +1,6 @@
-const ra_observers = function (logger) {
+import logger from "../framework";
+
+const ra_observers = function () {
 
 	return {
 		observeMutations: function (params) {

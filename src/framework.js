@@ -3,33 +3,34 @@ import ra_utils from "./components/utils";
 import ra_observers from "./components/observers";
 import ra_trackers from "./components/trackers";
 
+export let globals; // for framework use
+export let logger;
+
 window.ra_framework = function(config) {
 
-	const logger = new ra_logger({
-		experiment: config.experiment,
-		debug: (window.location.hash === "#ra-debug") ? true : config.debug
+	globals = {...config};
+
+	console.log('globals', globals);
+
+	logger = new ra_logger({
+		experiment: globals.experiment,
+		debug: (window.location.hash === "#ra-debug") ? true : globals.debug
 	});
-	const utils = new ra_utils(logger);
-	const trackers = new ra_trackers(logger, {
-		exp: config.experiment,
-		htj: config.hotjar,
-		mob: config.devices.mobile,
-		pld: config.pageLoad,
-		etc: config.eventTrackerElements,
-		ioc: config.intersectionObserverElements
-	});
+
+	const utils = new ra_utils(); // for exposure to test script
+	const trackers = new ra_trackers();
 
 	return {
 		init: callback => {
 			try {
 
-				logger.info("init: start", config);
+				logger.info("init: start", globals);
 
-				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
+				if (globals.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
 
 				const isMobile = utils.isMobile();
 
-				if((config.devices.desktop && !isMobile) || (config.devices.mobile && isMobile)) {
+				if((globals.devices.desktop && !isMobile) || (globals.devices.mobile && isMobile)) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
@@ -46,10 +47,8 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
-		observers: new ra_observers(logger),
-		track: trackers.sendDimension
+		observers: new ra_observers(),
+		tracker: trackers.sendDimension
 	}
 
 }
-
-export default ra_framework;

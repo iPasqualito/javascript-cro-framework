@@ -23,7 +23,6 @@
     "sass": "^1.26.3"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "framework": "0.0.0"
+    "axios": "^0.21.1"
   }
 }
