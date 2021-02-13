@@ -1,13 +1,11 @@
-import globals from "../framework";
-
-const ra_logger = function (params) {
+const ra_logger = function (cfg) {
 
 	let logStack = [],
 		kickOff = performance.now(),
 		config = {
-			debug: globals.debug,
+			debug: cfg.debug,
 			flushed: false,
-			testId: globals.experiment.id + globals.experiment.variation.id,
+			testId: cfg.experiment.id + cfg.experiment.variation.id,
 			_style: {
 				logCSS: "color:#28a745;",
 				infoCSS: "color:#17a2b8;",

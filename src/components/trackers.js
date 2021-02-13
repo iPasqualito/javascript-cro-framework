@@ -1,7 +1,6 @@
 import ra_observers from "./observers";
-import {logger, globals} from "../framework";
 
-const ra_trackers = function () {
+const ra_trackers = function (logger, config) {
 
 	const observers = new ra_observers(logger);
 
@@ -9,19 +8,19 @@ const ra_trackers = function () {
 		logger.info("sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
-			eventCategory: `${globals.experiment.id}: ${globals.experiment.name}`,
+			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
 			eventAction: eventAction,
-			eventLabel: `${globals.experiment.variation.id}: ${globals.experiment.variation.name}`,
+			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
 			eventNonInteraction: eventNonInteraction // if not sent default to true
 		});
 	};
 
 	const triggerHotjar = function () {
-		logger.info("triggerHotjar", globals.experiment.id + globals.experiment.variation.id);
+		logger.info("triggerHotjar", config.experiment.id + config.experiment.variation.id);
 		window.hj = window.hj || function () {
 			(window.hj.q = window.hj.q || []).push(arguments);
 		};
-		window.hj("trigger", globals.experiment.id + globals.experiment.variation.id);
+		window.hj("trigger", config.experiment.id + config.experiment.variation.id);
 	};
 
 	const trackElements = function (element) {  // courtesy of Michiel Kikkert, @Dutch_Guy
@@ -120,26 +119,26 @@ const ra_trackers = function () {
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				if (globals.devices.mobile) {
+				if (config.devices.mobile) {
 					setSwipeEvents();
 				}
-				if (globals.pageLoad) {
+				if (config.pageLoad) {
 					sendDimension("Page Load Event");
 				} else {
 					logger.warn("track: pageLoad event not set");
 				}
-				if (globals.hotjar) {
+				if (config.hotjar) {
 					triggerHotjar();
 				} else {
 					logger.warn("track: hotjar not set");
 				}
-				if (globals.eventTrackerElements && globals.eventTrackerElements.length) {
-					globals.eventTrackerElements.forEach(e => trackElements(e));
+				if (config.eventTrackerElements && config.eventTrackerElements.length) {
+					config.eventTrackerElements.forEach(e => trackElements(e));
 				} else {
 					logger.warn("track: eventTrackerElements not set");
 				}
-				if (globals.intersectionObserverElements && globals.intersectionObserverElements.length) {
-					globals.intersectionObserverElements.forEach(e => observers.observeIntersections({
+				if (config.intersectionObserverElements && config.intersectionObserverElements.length) {
+					config.intersectionObserverElements.forEach(e => observers.observeIntersections({
 						...e,
 						inCallback: () => {
 							sendDimension(`intersection observed: ${e.tag}`)

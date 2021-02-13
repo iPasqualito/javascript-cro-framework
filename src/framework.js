@@ -3,34 +3,31 @@ import ra_utils from "./components/utils";
 import ra_observers from "./components/observers";
 import ra_trackers from "./components/trackers";
 
-export let globals; // for framework use
-export let logger;
-
 window.ra_framework = function(config) {
 
-	globals = {...config};
+	// todo: make logger and config 'globally available
+	// so we don't have to pass them as parameters
+	// logger should be a singleton
 
-	console.log('globals', globals);
-
-	logger = new ra_logger({
-		experiment: globals.experiment,
-		debug: (window.location.hash === "#ra-debug") ? true : globals.debug
+	const logger = new ra_logger({
+		experiment: config.experiment,
+		debug: (window.location.hash === "#ra-debug") ? true : config.debug
 	});
 
-	const utils = new ra_utils(); // for exposure to test script
-	const trackers = new ra_trackers();
+	const utils = new ra_utils(logger);
+	const trackers = new ra_trackers(logger, config);
 
 	return {
 		init: callback => {
 			try {
 
-				logger.info("init: start", globals);
+				logger.info("init: start", config);
 
-				if (globals.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
+				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
 
 				const isMobile = utils.isMobile();
 
-				if((globals.devices.desktop && !isMobile) || (globals.devices.mobile && isMobile)) {
+				if((config.devices.desktop && !isMobile) || (config.devices.mobile && isMobile)) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
@@ -47,7 +44,7 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
-		observers: new ra_observers(),
+		observers: new ra_observers(logger),
 		tracker: trackers.sendDimension
 	}
 

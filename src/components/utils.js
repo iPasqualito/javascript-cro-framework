@@ -1,6 +1,4 @@
-import logger from "../framework";
-
-const ra_utils = function() {
+const ra_utils = function (logger) {
 
 	return {
 		awaitNode: (parameters, callback) => {
@@ -31,35 +29,43 @@ const ra_utils = function() {
 			const mobile = typeof uaDataIsMobile === "boolean" ? uaDataIsMobile : legacyIsMobileCheck;
 			return mobile;
 		},
-		addNode: function (type, attrs) {
+		addNode: function (type, position, target, attrs) {
 			logger.info("addNode", [type, attrs]);
-			const el = document.createElement(type);
-			this.setAttributes(el, attrs);
-			return el;
+			const node = document.createElement(type);
+			this.setProperties(node, attrs);
+			if (target === "replace") target.parentNode.replaceChild(node, target);
+			else target.insertAdjacentElement(position, node);
+			return node;
 		},
 		addStyle: function (css, id) {
-			logger.info("addStyle", [css.replace(/(\r\n|\n|\r|\t)/gm,""), id]);
+			logger.info("addStyle", [css.replace(/(\r\n|\n|\r|\t)/gm, ""), id]);
 			try {
 				if (document.getElementById(id)) {
 					logger.log("addStyle: StyleSheet already exists in DOM");
 				} else {
 					const head = document.head || document.getElementsByTagName("head")[0];
-					const link = this.addNode('style', {
+					const link = this.addNode('style', "beforeend", head, {
 							id: id,
 							rel: "stylesheet",
 							type: "text/css"
 						}
 					);
 					link.appendChild(document.createTextNode(css));
-					head.appendChild(link);
+					//head.appendChild(link);
 				}
 			} catch (error) {
 				logger.error("addStyle: fail", error);
 			}
 		},
-		setAttributes: function (e, a) {
-			logger.info("setAttributes", [e, a]);
-			Object.entries(a).map(([key, value]) => e.setAttribute(key, value));
+		setProperties: function (element, attributes) {
+			logger.info("setProperties", [element, attributes]);
+			// iterate through each property
+			Object.entries(attributes).map(([key, value]) => {
+				// match innerText, innerHTML or event attributes
+				if (/^(inner|on)\w+$/i.test(key)) element[key] = attributes[key]
+				// else just set the attribute
+				else element.setAttribute(key, value)
+			});
 		},
 		editQueryParam: function (parameters) {
 			logger.info("editQueryParam", parameters);
