@@ -58,8 +58,8 @@ const ra_observers = function (logger) {
 				mutations.forEach(function (mutation) {
 					try {
 						handleMutation(mutation);
-					} catch (e) {
-						logger.error("observeMutations: Error", e);
+					} catch (error) {
+						logger.error("observeMutations: error caught", error);
 					}
 				});
 				if (params.disconnect) {

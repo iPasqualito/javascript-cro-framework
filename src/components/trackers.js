@@ -76,7 +76,7 @@ const ra_trackers = function (logger, config) {
 
 		if (errorStack.length) {
 			errorStack.forEach((entry, i) => logger.error(`trackElements error ${i}`, entry));
-			sendDimension("trackElements failure: " + errorStack.length + " errors");
+			sendDimension("trackElements error(s) caught: " + errorStack.length + " error(s)");
 		} else {
 			sendDimension("trackElements active");
 		}
@@ -106,8 +106,8 @@ const ra_trackers = function (logger, config) {
 				n = null, u = null, l = null
 			}, !1);
 			let n = null, u = null, a = null, i = null, l = null, o = null
-		} catch (e) {
-			logger.error("setSwipeEvents: failed", e);
+		} catch (error) {
+			logger.error("setSwipeEvents: error caught", error);
 		}
 	}
 

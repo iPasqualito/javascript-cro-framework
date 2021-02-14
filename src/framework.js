@@ -22,9 +22,9 @@ window.ra_framework = function(config) {
 		init: callback => {
 			try {
 
-				logger.info("init: start", config);
+				logger.info("init", config);
 
-				if (config.debug) logger.warn("Init: debugger switched on in config, consider switching it off on goLive.");
+				if (config.debug) logger.warn("init: consider setting debug to false.");
 
 				const isMobile = utils.isMobile();
 
@@ -32,12 +32,12 @@ window.ra_framework = function(config) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
-					logger.error("Init: device conditions not met");
+					logger.warn("init: device conditions not met");
 				}
 
 			}
-			catch(e) {
-				logger.error("Init: fail", e);
+			catch(error) {
+				logger.error("init: error caught", error);
 			}
 			finally {
 				logger.log("init: done");

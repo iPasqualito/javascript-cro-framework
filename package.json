@@ -1,28 +1,25 @@
 {
-  "name": "javascript-cro-framework",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Vanilla JS CRO Framework",
-  "main": "index.js",
-  "scripts": {
-    "dev": "npm run clean && parcel public/index.html --out-dir development -p 3000",
-    "build": "parcel build public/*.html --out-dir dist --public-url ./",
-    "clean": "rimraf ./development && rimraf -rf ./.cache"
-  },
-  "keywords": [
-    "parcel"
-  ],
-  "author": "Pascal Louwes",
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-transform-runtime": "^7.9.0",
-    "@babel/runtime-corejs2": "^7.9.2",
-    "parcel-bundler": "^1.12.4",
-    "rimraf": "^3.0.2",
-    "sass": "^1.26.3"
-  },
-  "dependencies": {
-    "axios": "^0.21.1"
-  }
+	"name": "javascript-cro-framework",
+	"version": "1.0.0",
+	"description": "",
+	"main": "test.js",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"scripts": {
+		"clean": "rm dist/bundle.js",
+		"start": "parcel public/index.html",
+		"build-prod": "parcel build public/index.html"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.12.16",
+		"@babel/preset-env": "^7.12.16",
+		"eslint": "^7.20.0",
+		"eslint-config-prettier": "^7.2.0",
+		"eslint-plugin-prettier": "^3.3.1",
+		"parcel-bundler": "^1.12.4",
+		"prettier": "^2.2.1",
+		"sass": "^1.32.7"
+	}
 }

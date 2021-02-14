@@ -5,7 +5,7 @@ const ra_logger = function(cfg) {
 		config = {
 			debug: cfg.debug,
 			flushed: false,
-			testId: cfg.experiment.id + cfg.experiment.variation.id,
+			id: cfg.experiment.id + cfg.experiment.variation.id,
 			color: {
 				log: "#28a745;",
 				info: "#17a2b8;",
@@ -17,9 +17,9 @@ const ra_logger = function(cfg) {
 		printRow = function(row) {
 			let css = `font-family:roboto;font-size:12px;padding:5px 0;font-weight:bold;color:${config.color[row.type]}`;
 			if (typeof row.obj === "undefined") {
-				console.log("%c [" + row.timestamp + "s] " + config.testId + (typeof row.msg === "object" ? " %o" : (typeof row.msg === "number" ? " %f" : " %s")), css, row.msg);
+				console.log("%c [" + row.timestamp + "s] " + config.id + (typeof row.msg === "object" ? " %o" : (typeof row.msg === "number" ? " %f" : " %s")), css, row.msg);
 			} else {
-				console.log("%c [" + row.timestamp + "s] " + config.testId + (typeof row.obj === "object" ? " %s %o" : (typeof row.obj === "number" ? " %s %f" : " %s %s")), css, row.msg, row.obj);
+				console.log("%c [" + row.timestamp + "s] " + config.id + (typeof row.obj === "object" ? " %s %o" : (typeof row.obj === "number" ? " %s %f" : " %s %s")), css, row.msg, row.obj);
 			}
 		},
 		printStack = () => {

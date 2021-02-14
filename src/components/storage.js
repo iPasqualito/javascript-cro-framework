@@ -26,11 +26,11 @@ const ra_storage = function(logger) {
 		},
 		localStore: {
 			read: function (key) {
-				logger.info("storage.read: start", key);
+				logger.info("storage.read", key);
 				const value = localStorage.getItem(key)
 				try {
 					return JSON.parse(value);
-				} catch (e) {
+				} catch (error) {
 					return value;
 				}
 			},

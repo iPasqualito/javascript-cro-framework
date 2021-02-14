@@ -31,7 +31,7 @@ const ra_utils = (logger) => {
 				link.appendChild(document.createTextNode(css));
 			}
 		} catch (error) {
-			logger.error("addStyle: fail", error);
+			logger.error("addStyle: error", error);
 		}
 	};
 
@@ -42,19 +42,19 @@ const ra_utils = (logger) => {
 		try {
 			new MutationObserver((mutation, observer) => {
 				let className = typeof parameters.className !== "undefined" ? parameters.className : "ra-framework-found",
-					el = document.querySelector(`${parameters.selector}:not(.${className})`);
-				if (el) {
+					node = document.querySelector(`${parameters.selector}:not(.${className})`);
+				if (node) {
 					logger.log(`awaitNode: '${parameters.tag}' found${parameters.disconnect ? ", done." : "."}`);
-					el.classList.add(className);
+					node.classList.add(className);
 					if (parameters.disconnect) observer.disconnect();
-					if (typeof callback === "function") callback(el);
+					if (typeof callback === "function") callback(node);
 				}
 			}).observe(parameters.parent || document.body, {
 				subtree: parameters.recursive,
 				childList: true
 			});
-		} catch (e) {
-			logger.error("awaitNode: error", e);
+		} catch (error) {
+			logger.error("awaitNode: error", error);
 		}
 	};
 
