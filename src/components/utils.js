@@ -63,17 +63,17 @@ const ra_utils = (logger) => {
 		logger.info("editQueryParam", parameters);
 
 		let url = new URL(document.location.href),
-			spms = new URLSearchParams(url.search);
+			searchParams = new URLSearchParams(url.search);
 		for (let key in parameters) {
 			if (parameters.hasOwnProperty(key)) {
 				if (!parameters[key]) {
-					spms.delete(key);
+					searchParams.delete(key);
 				} else {
-					spms.set(key, parameters[key]);
+					searchParams.set(key, parameters[key]);
 				}
 			}
 		}
-		url.search = spms.toString();
+		url.search = searchParams.toString();
 		return url.toString();
 	};
 
