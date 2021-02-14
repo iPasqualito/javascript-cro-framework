@@ -50,10 +50,10 @@
 			`, `ra-cro-style`);
 
 			framework.logger.info("element loaded", element);
-			framework.utils.addNode("p", "afterend", element, {
+			framework.utils.addNode("p", {
 				class: "elliot new",
-				innerText: "Daarom ben ik hier..."
-			});
+				innerText: "The test code picked that up and put me here..."
+			},"afterend", element);
 		}
 
 		framework.utils.awaitNode({

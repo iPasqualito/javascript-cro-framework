@@ -1,11 +1,11 @@
 const ra_utils = (logger) => {
 
-	const addNode = (type, position, target, attrs) => {
+	const addNode = (tagName, attributes, position, target) => {
 
-		logger.info("addNode", [type, attrs]);
+		logger.info("addNode", [tagName, attributes, position, target]);
 
-		const node = document.createElement(type);
-		setElementProperties(node, attrs);
+		const node = document.createElement(tagName);
+		setElementProperties(node, attributes);
 
 		if (position && target) {
 			if (position === "replace") target.parentNode.replaceChild(node, target);
@@ -23,13 +23,11 @@ const ra_utils = (logger) => {
 			if (document.getElementById(id)) {
 				logger.warn("addStyle: StyleSheet already exists in DOM");
 			} else {
-				const head = document.head || document.getElementsByTagName("head")[0];
-				const link = addNode('style', "beforeend", head, {
-						id: id,
-						rel: "stylesheet",
-						type: "text/css"
-					}
-				);
+				const link = addNode('style', {
+					id: id,
+					rel: "stylesheet",
+					type: "text/css"
+				}, "beforeend", document.head);
 				link.appendChild(document.createTextNode(css));
 			}
 		} catch (error) {

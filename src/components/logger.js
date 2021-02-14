@@ -39,25 +39,25 @@ const ra_logger = function(cfg) {
 	return {
 		printStack: printStack,
 		log: (message, object) => process({
-			timeStamp: timeStamp(),
+			timestamp: timeStamp(),
 			type: "log",
 			msg: message,
 			obj: object
 		}),
 		info: (message, object) => process({
-			timeStamp: timeStamp(),
+			timestamp: timeStamp(),
 			type: "info",
 			msg: message,
 			obj: object
 		}),
 		warn: (message, object) => process({
-			timeStamp: timeStamp(),
+			timestamp: timeStamp(),
 			type: "warn",
 			msg: message,
 			obj: object
 		}),
 		error: (message, object) => process({
-			timeStamp: timeStamp(),
+			timestamp: timeStamp(),
 			type: "error",
 			msg: message,
 			obj: object
