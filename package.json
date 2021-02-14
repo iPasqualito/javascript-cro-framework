@@ -4,8 +4,17 @@
 	"description": "",
 	"main": "test.js",
 	"keywords": [],
-	"author": "",
+	"author": {
+		"name" : "Pascal Louwes",
+		"email" : "pascal@recoveryarea.nl",
+		"url" : "https://www.recoveryarea.nl/"
+	},
 	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/iPasqualito/javascript-cro-framework"
+	},
+	"private": true,
 	"scripts": {
 		"clean": "rm dist/bundle.js",
 		"start": "parcel public/index.html",
