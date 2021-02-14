@@ -6,7 +6,7 @@ import ra_storage from "./components/storage";
 
 window.ra_framework = function(config) {
 
-	// todo: make logger and config 'globally available
+	// todo: make logger and config 'globally' available
 	// so we don't have to pass them as parameters
 	// logger should be a singleton
 
