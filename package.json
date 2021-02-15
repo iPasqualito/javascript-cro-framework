@@ -16,7 +16,7 @@
 	},
 	"private": true,
 	"scripts": {
-		"clean": "rm dist/bundle.js",
+		"clean": "rm dist/*",
 		"start": "parcel public/index.html",
 		"build-prod": "parcel build public/index.html"
 	},
