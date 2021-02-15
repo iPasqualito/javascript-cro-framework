@@ -1,8 +1,12 @@
+import ra_observers from "./observers";
+
 const ra_utils = (logger) => {
+
+	const observers = new ra_observers(logger);
 
 	const addNode = (tagName, attributes, position, target) => {
 
-		logger.info("addNode", [tagName, attributes, position, target]);
+		logger.info("utils: addNode", [tagName, attributes, position, target]);
 
 		const node = document.createElement(tagName);
 		setElementProperties(node, attributes);
@@ -17,11 +21,11 @@ const ra_utils = (logger) => {
 
 	const addStyle = (css, id) => {
 
-		logger.info("addStyle", [css.replace(/(\r\n|\n|\r|\t)/gm, ""), id]);
+		logger.info("utils: addStyle", [css.replace(/(\r\n|\n|\r|\t)/gm, ""), id]);
 
 		try {
 			if (document.getElementById(id)) {
-				logger.warn("addStyle: StyleSheet already exists in DOM");
+				logger.warn("utils: addStyle: StyleSheet already exists in DOM");
 			} else {
 				const link = addNode('style', {
 					id: id,
@@ -31,36 +35,37 @@ const ra_utils = (logger) => {
 				link.appendChild(document.createTextNode(css));
 			}
 		} catch (error) {
-			logger.error("addStyle: error", error);
+			logger.error("utils: addStyle: error", error);
 		}
 	};
 
 	const awaitNode = (parameters, callback) => {
 
-		logger.info("awaitNode", [parameters, callback]);
+		logger.info("utils: awaitNode", [parameters, callback]);
 
 		try {
-			new MutationObserver((mutation, observer) => {
-				let className = typeof parameters.className !== "undefined" ? parameters.className : "ra-framework-found",
-					node = document.querySelector(`${parameters.selector}:not(.${className})`);
-				if (node) {
-					logger.log(`awaitNode: '${parameters.tag}' found${parameters.disconnect ? ", done." : "."}`);
-					node.classList.add(className);
-					if (parameters.disconnect) observer.disconnect();
-					if (typeof callback === "function") callback(node);
-				}
-			}).observe(parameters.parent || document.body, {
-				subtree: parameters.recursive,
-				childList: true
+			const element = document.querySelector(parameters.selector);
+			if (element) callback(element);
+			else observers.observeMutations({
+				parent: parameters.parent,
+				child: parameters.selector,
+				tag: parameters.tag,
+				foundClass: parameters.foundClass,
+				disconnect: parameters.disconnect,
+				config: {
+					childList: true,
+					subtree: parameters.recursive,
+				},
+				callback: callback
 			});
 		} catch (error) {
-			logger.error("awaitNode: error", error);
+			logger.error("utils: awaitNode: error", error);
 		}
 	};
 
 	const editQueryParam = (parameters) => {
 
-		logger.info("editQueryParam", parameters);
+		logger.info("utils: editQueryParam", parameters);
 
 		let url = new URL(document.location.href),
 			searchParams = new URLSearchParams(url.search);
@@ -79,7 +84,7 @@ const ra_utils = (logger) => {
 
 	const isMobile = () => {
 
-		logger.info("isMobile");
+		logger.info("utils: isMobile");
 
 		const uaDataIsMobile = typeof window.navigator.userAgentData === "undefined" ? "undefined" : window.navigator.userAgentData.mobile;
 		const legacyIsMobileCheck = (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
@@ -90,7 +95,7 @@ const ra_utils = (logger) => {
 
 	const setElementProperties = (element, attributes) => {
 
-		logger.info("setElementProperties", [element, attributes]);
+		logger.info("utils: setElementProperties", [element, attributes]);
 		// iterate through each property
 		Object.entries(attributes).map(([key, value]) => {
 			// match innerText, innerHTML or event attributes

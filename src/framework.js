@@ -21,10 +21,7 @@ window.ra_framework = function(config) {
 	return {
 		init: callback => {
 			try {
-
-				logger.info("init", config);
-
-				if (config.debug) logger.warn("init: consider setting debug to false.");
+				if (config.debug) logger.warn("framework: init: Framework debugging activated.", config);
 
 				const isMobile = utils.isMobile();
 
@@ -32,15 +29,15 @@ window.ra_framework = function(config) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
-					logger.warn("init: device conditions not met");
+					logger.warn("framework: init: device conditions not met");
 				}
 
 			}
 			catch(error) {
-				logger.error("init: error caught", error);
+				logger.error("framework: init: error caught", error);
 			}
 			finally {
-				logger.log("init: done");
+				logger.log("framework: init: done");
 			}
 		},
 		logger: logger,

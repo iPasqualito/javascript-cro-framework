@@ -5,7 +5,7 @@ const ra_trackers = function (logger, config) {
 	const observers = new ra_observers(logger);
 
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
-		logger.info("sendDimension", [eventAction, eventNonInteraction]);
+		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
@@ -16,7 +16,7 @@ const ra_trackers = function (logger, config) {
 	};
 
 	const triggerHotjar = function () {
-		logger.info("triggerHotjar", config.experiment.id + config.experiment.variation.id);
+		logger.info("trackers: triggerHotjar", config.experiment.id + config.experiment.variation.id);
 		window.hj = window.hj || function () {
 			(window.hj.q = window.hj.q || []).push(arguments);
 		};
@@ -35,7 +35,7 @@ const ra_trackers = function (logger, config) {
 					found = false,
 					_selectors = document.querySelectorAll(el.selector);
 
-				//logger.log("currentTime", currentTime);
+				//logger.log("ctrackers: urrentTime", currentTime);
 
 				_selectors.forEach(function (_selector) {
 					if (_selector !== null && el.events.includes(event.type) && (event.target.matches(el.selector) || _selector.contains(event.target))) {
@@ -45,7 +45,7 @@ const ra_trackers = function (logger, config) {
 				if (!found) return;
 				if (threshold === 0) {
 					threshold = performance.now() + el.throttle;
-					//logger.log("threshold", threshold);
+					//logger.log("ttrackers: hreshold", threshold);
 					if (el.first) {
 						execute();
 						el.first = false;
@@ -58,16 +58,16 @@ const ra_trackers = function (logger, config) {
 
 				function execute() {
 					counter++;
-					logger.log("handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
+					logger.log("trackers: handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
 					sendDimension(`${el.tag}`, false);
 				}
 			};
 		};
-		logger.info("trackElements", element);
+		logger.info("trackers: trackElements", element);
 
 		element.events.forEach(e => {
 			try {
-				logger.log(`trackElements: ${e} eventListener starting for`, element.tag);
+				logger.log(`trackers: trackElements: ${e} eventListener starting for`, element.tag);
 				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
 			} catch (error) {
 				errorStack.push[error];
@@ -75,7 +75,7 @@ const ra_trackers = function (logger, config) {
 		});
 
 		if (errorStack.length) {
-			errorStack.forEach((entry, i) => logger.error(`trackElements error ${i}`, entry));
+			errorStack.forEach((entry, i) => logger.error(`trackers: trackElements error ${i}`, entry));
 			sendDimension("trackElements error(s) caught: " + errorStack.length + " error(s)");
 		} else {
 			sendDimension("trackElements active");
@@ -83,7 +83,7 @@ const ra_trackers = function (logger, config) {
 	};
 
 	const setSwipeEvents = function (t = window, e = document) {
-		logger.info("setSwipeEvents");
+		logger.info("trackers: setSwipeEvents");
 		// <script src="https://gist.github.com/honsa/35282fa386fe5624e3b0502496c9974a.js"></script>
 		try {
 			"function" != typeof t.CustomEvent && (t.CustomEvent = function (t, n) {
@@ -107,7 +107,7 @@ const ra_trackers = function (logger, config) {
 			}, !1);
 			let n = null, u = null, a = null, i = null, l = null, o = null
 		} catch (error) {
-			logger.error("setSwipeEvents: error caught", error);
+			logger.error("trackers: setSwipeEvents: error caught", error);
 		}
 	}
 
@@ -125,17 +125,17 @@ const ra_trackers = function (logger, config) {
 				if (config.pageLoad) {
 					sendDimension("Page Load Event");
 				} else {
-					logger.warn("track: pageLoad event not set");
+					logger.warn("trackers: track: pageLoad event not set");
 				}
 				if (config.hotjar) {
 					triggerHotjar();
 				} else {
-					logger.warn("track: hotjar not set");
+					logger.warn("trackers: track: hotjar not set");
 				}
 				if (config.eventTrackerElements && config.eventTrackerElements.length) {
 					config.eventTrackerElements.forEach(e => trackElements(e));
 				} else {
-					logger.warn("track: eventTrackerElements not set");
+					logger.warn("trackers: track: eventTrackerElements not set");
 				}
 				if (config.intersectionObserverElements && config.intersectionObserverElements.length) {
 					config.intersectionObserverElements.forEach(e => observers.observeIntersections({
@@ -145,7 +145,7 @@ const ra_trackers = function (logger, config) {
 						}
 					}));
 				} else {
-					logger.warn("track: intersectionObserverElements not set");
+					logger.warn("trackers: track: intersectionObserverElements not set");
 				}
 			});
 		}

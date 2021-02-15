@@ -5,8 +5,8 @@
 			id: "ra-000",
 			name: "SiteWide - CRO Framework",
 			variation: {
-				id: "B",
-				name: "Variant 1"
+				id: "b",
+				name: "variant 1"
 			},
 		},
 		debug: true,
@@ -59,7 +59,7 @@
 		framework.utils.awaitNode({
 			selector: "p.elliot",
 			tag: "elliot paragraaf",
-			className: "gevonden",
+			foundClass: "gevonden",
 			parent: d,
 			recursive: true,
 			disconnect: true
