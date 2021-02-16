@@ -11,15 +11,18 @@
 <body>
 <div class="container">
 	<h1>recoveryArea Framework Test Page</h1>
-	<script>
-		setTimeout(() => {
-			const element = document.createElement("p");
-			element.innerText = "This element was added to the DOM...";
-			element.classList.add("elliot");
-			element.style.fontSize = "1em";
-			document.querySelector(".container").appendChild(element);
-		}, 1500);
-	</script>
 </div>
+<div class="banner">
+	<p>This one gets picked up by the intersection observer...</p>
+</div>
+<script>
+	setTimeout(() => {
+		const element = document.createElement("p");
+		element.innerText = "This element was added to the DOM...";
+		element.id ="elliot";
+		element.style.fontSize = "1em";
+		document.querySelector(".container").appendChild(element);
+	}, 1500);
+</script>
 </body>
 </html>

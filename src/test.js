@@ -21,8 +21,8 @@
 			tag: "click on title element"
 		}],
 		intersectionObserverElements: [{
-			selector: "p.new",
-			tag: "new paragraph",
+			selector: "div.banner",
+			tag: "intersection test",
 		}]
 	};
 
@@ -43,27 +43,32 @@
 			`, `ra-cro-style`);
 
 			framework.logger.info("element loaded", element);
-			framework.utils.addNode("p", {
-				class: "elliot new",
-				innerText: "The test code picked that up and put me here..."
-			}, "afterend", element);
+			framework.utils.addNode(
+				"p",
+				{
+					class: "elliot new",
+					innerText: "The test code picked that up and put me here..."
+				},
+				"afterend",
+				element // target element
+			);
 		}
 
 		framework.utils.awaitNode({
-			selector: "p.elliot",
-			tag: "elliot paragraph",
-			foundClass: "found",
-			parent: d,
-			recursive: true,
-			disconnect: true
-		}, element => {
+			selector: "p#elliot",       // the element we're looking for
+			tag: "elliot paragraph",    // tag it for identification
+			foundClass: "found",        // add a class when it's found
+			parent: d,                  // the parent element, narrow the scope
+			recursive: true,            // search the whole tree or just the parent
+			disconnect: true            // stop looking when element is found
+		}, element => {         // function to run after element is found
 			try {
 				changeDom(element);
 			} catch (error) {
 				framework.logger.error("an error occurred", error);
 			} finally {
-				framework.sendDimension("Test code ran successfully");
-				w.dispatchEvent(new Event("raExperimentLoaded"));
+				framework.sendDimension("Experiment loaded");
+				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
 			}
 
 		});

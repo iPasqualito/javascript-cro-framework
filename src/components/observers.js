@@ -10,7 +10,9 @@ const ra_observers = function (logger) {
 				let nodeList = [],
 					parent = parameters.parent,
 					children = parent.querySelectorAll(parameters.child);
-				const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && node.localName.toLowerCase() === parameters.child.match(/^([a-z]*)[^\.\#[]/)[0].toLowerCase());// we are only interested in nodes with the same tag name.
+
+				const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && Array.from(children).includes(node));
+				//const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && node.localName.toLowerCase() === parameters.child.match(/^([a-z]*)[^\.\#[]/)[0].toLowerCase());// we are only interested in nodes with the same tag name.
 				const getNode = (haystack, needle) => Array.from(haystack).includes(needle);// does the children collection contain the mutation target?
 
 				const handleChildList = mutation => {
@@ -88,16 +90,17 @@ const ra_observers = function (logger) {
 				logger.log("observers: observeIntersections: observer starting for", e);
 
 				const observer = new IntersectionObserver(function (entries) {
+					let found = false
 					entries.forEach(function (entry) {
-						if (entry.isIntersecting) {
-							if (typeof element.inCallback === "function") element.inCallback.call(entry);
-						} else {
-							if (typeof element.outCallback === "function") element.outCallback.call(entry);
+						if (entry.isIntersecting && typeof element.inCallback === "function") {
+							logger.log("observers: observeIntersections: intersecting");
+							element.inCallback.call(entry);
+							if (typeof element.once !== "undefined" ? element.once : true) {
+								logger.log("observers: observeIntersections: disconnecting");
+								observer.unobserve(e);
+							}
 						}
-						if (typeof element.once !== "undefined" ? element.once : true) {
-							logger.log("observers: observeIntersections: disconnecting.");
-							observer.unobserve(e);
-						}
+
 					});
 				}, {
 					root: element.root ? element.root : null,
