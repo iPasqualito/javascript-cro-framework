@@ -2,7 +2,7 @@ import ra_observers from "./observers";
 
 const ra_trackers = function (logger, config) {
 
-	const observers = new ra_observers(logger);
+	const observeIntersections = new ra_observers(logger).observeIntersections;
 
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
@@ -23,8 +23,8 @@ const ra_trackers = function (logger, config) {
 		window.hj("trigger", config.experiment.id + config.experiment.variation.id);
 	};
 
-	const trackElements = function (element) {  // courtesy of Michiel Kikkert, @Dutch_Guy
-
+	const trackElements = function (element) {
+		// original function written by Michiel Kikkert, @Dutch_Guy
 		const errorStack = [];
 		const events = typeof element.events !== "undefined" ? element.events : [];
 
@@ -65,8 +65,8 @@ const ra_trackers = function (logger, config) {
 		logger.info("trackers: trackElements", element);
 
 		if(events.length === 0){ // default device specific events
-			config.devices.desktop && events.push("mouseup");
-			config.devices.mobile && events.push("touchend");
+			config.devices.desktop && !window.ra_mobile && events.push("mouseup");
+			config.devices.mobile && window.ra_mobile && events.push("touchend");
 		}
 
 		events.forEach(e => {
@@ -87,8 +87,9 @@ const ra_trackers = function (logger, config) {
 	};
 
 	const setSwipeEvents = function (t = window, e = document) {
+
 		logger.info("trackers: setSwipeEvents");
-		// <script src="https://gist.github.com/honsa/35282fa386fe5624e3b0502496c9974a.js"></script>
+
 		try {
 			"function" != typeof t.CustomEvent && (t.CustomEvent = function (t, n) {
 				n = n || {bubbles: !1, cancelable: !1, detail: void 0};
@@ -117,40 +118,32 @@ const ra_trackers = function (logger, config) {
 
 	return {
 		sendDimension: sendDimension,
-		track: function () {
+		track: function (mobile) {
 
 			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				if (config.devices.mobile) {
-					setSwipeEvents();
-				}
-				if (config.pageLoad) {
-					sendDimension("Page Load Event");
-				} else {
-					logger.warn("trackers: track: pageLoad event not set");
-				}
-				if (config.hotjar) {
-					triggerHotjar();
-				} else {
-					logger.warn("trackers: track: hotjar not set");
-				}
-				if (config.eventTrackerElements && config.eventTrackerElements.length) {
-					config.eventTrackerElements.forEach(e => trackElements(e));
-				} else {
-					logger.warn("trackers: track: eventTrackerElements not set");
-				}
-				if (config.intersectionObserverElements && config.intersectionObserverElements.length) {
-					config.intersectionObserverElements.forEach(e => observers.observeIntersections({
+				//
+				if (config.devices.mobile) setSwipeEvents();
+				//
+				if (config.pageLoad) sendDimension("Page Load Event");
+				else logger.warn("trackers: track: pageLoad event not set");
+				//
+				if (config.hotjar) triggerHotjar();
+				else logger.warn("trackers: track: hotjar not set");
+				//
+				if (typeof config.eventTrackerElements !== "undefined" && config.eventTrackerElements.length) config.eventTrackerElements.forEach(e => trackElements(e));
+				else logger.warn("trackers: track: eventTrackerElements not set");
+				//
+				if (typeof config.intersectionObserverElements !== "undefined"  && config.intersectionObserverElements.length) {
+					config.intersectionObserverElements.forEach(e => observeIntersections({
 						...e,
 						inCallback: () => {
 							sendDimension(`intersection observed: ${e.tag}`)
 						}
 					}));
-				} else {
-					logger.warn("trackers: track: intersectionObserverElements not set");
-				}
+				} else logger.warn("trackers: track: intersectionObserverElements not set");
 			});
 		}
 	}

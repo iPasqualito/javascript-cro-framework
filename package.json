@@ -2,7 +2,7 @@
 	"name": "javascript-cro-framework",
 	"version": "1.0.0",
 	"description": "AB Testing Framework",
-	"main": "test.js",
+	"main": "framework.js",
 	"keywords": [],
 	"author": {
 		"name" : "Pascal Louwes",

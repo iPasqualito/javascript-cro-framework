@@ -13,21 +13,22 @@ window.ra_framework = function(config) {
 
 	const trackers = new ra_trackers(logger, config);
 	const utils = new ra_utils(logger);
+	const mobile = window.ra_mobile = utils.isMobile();
+
+	console.log("- mobile:", mobile);
+	console.log("- window.mobile:", window.ra_mobile);
 
 	return {
 		init: callback => {
 			try {
-				if (config.debug) logger.warn("framework: init: Framework debugging activated.", config);
+				if (config.debug) logger.warn("framework: init: Framework debugging activated", config);
 
-				const isMobile = utils.isMobile();
-
-				if((config.devices.desktop && !isMobile) || (config.devices.mobile && isMobile)) {
+				if((config.devices.desktop && !mobile) || (config.devices.mobile && mobile)) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
 					logger.warn("framework: init: device conditions not met");
 				}
-
 			}
 			catch(error) {
 				logger.error("framework: init: error caught", error);
@@ -38,6 +39,7 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
+		device: mobile ? "mobile" : "desktop",
 		storage: new ra_storage(logger),
 		observers: new ra_observers(logger),
 		sendDimension: trackers.sendDimension
