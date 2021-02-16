@@ -1,18 +1,23 @@
-import ra_logger from "./components/logger";
+import { ra_logger } from './components/logger';
 import ra_utils from "./components/utils";
-import ra_observers from "./components/observers";
-import ra_trackers from "./components/trackers";
-import ra_storage from "./components/storage";
+import { ra_observers } from "./components/observers";
+import { ra_trackers } from "./components/trackers";
+import { ra_storage } from "./components/storage";
+
+
+declare global {
+    interface Window { ra_framework: any; ra_mobile: any; }
+}
 
 window.ra_framework = function(config) {
 
-	const logger = new ra_logger({
+	const logger = new (ra_logger({
 		experiment: config.experiment,
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug
-	});
+	}) as any);
 
-	const trackers = new ra_trackers(logger, config);
-	const utils = new ra_utils(logger);
+	const trackers = new (ra_trackers(logger, config) as any);
+	const utils = new (ra_utils(logger) as any);
 	const mobile = window.ra_mobile = utils.isMobile();
 
 	return {
@@ -37,8 +42,8 @@ window.ra_framework = function(config) {
 		logger: logger,
 		utils: utils,
 		device: mobile ? "mobile" : "desktop",
-		storage: new ra_storage(logger),
-		observers: new ra_observers(logger),
+		storage: new (ra_storage(logger) as any),
+		observers: new (ra_observers(logger) as any),
 		sendDimension: trackers.sendDimension
 	}
 

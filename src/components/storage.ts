@@ -1,4 +1,4 @@
-const ra_storage = function(logger) {
+export const ra_storage = function(logger) {
 
 	return {
 		cookie: {

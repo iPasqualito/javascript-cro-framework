@@ -1,6 +1,6 @@
-import ra_observers from "./observers";
+import { ra_observers } from "./observers";
 
-const ra_trackers = function (logger, config) {
+export const ra_trackers = function (logger, config) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
@@ -148,4 +148,4 @@ const ra_trackers = function (logger, config) {
 	}
 };
 
-export default ra_trackers;
+// export default ra_trackers;

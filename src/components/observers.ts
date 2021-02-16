@@ -1,4 +1,4 @@
-const ra_observers = function (logger) {
+export const ra_observers = function(logger)  {
 
 	return {
 		observeMutations: function (parameters) {
@@ -119,4 +119,4 @@ const ra_observers = function (logger) {
 
 }
 
-export default ra_observers;
+// export default ra_observers;

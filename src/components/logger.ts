@@ -1,6 +1,6 @@
-const ra_logger = function(cfg) {
+export function ra_logger (cfg) {
 
-	let logStack = [],
+        const logStack = [],
 		kickOff = performance.now(),
 		config = {
 			debug: cfg.debug,
@@ -65,4 +65,4 @@ const ra_logger = function(cfg) {
 	};
 };
 
-export default ra_logger;
+// export default ra_logger;
