@@ -67,7 +67,7 @@
 			} catch (error) {
 				framework.logger.error("an error occurred", error);
 			} finally {
-				framework.sendDimension("Experiment loaded");
+				framework.sendDimension(`experiment ${config.experiment.id}${config.experiment.variation.id} loaded`);
 				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
 			}
 

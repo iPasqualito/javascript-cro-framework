@@ -90,17 +90,21 @@ const ra_observers = function (logger) {
 				logger.log("observers: observeIntersections: observer starting for", e);
 
 				const observer = new IntersectionObserver(function (entries) {
-					let found = false
+					let ran = false;
 					entries.forEach(function (entry) {
 						if (entry.isIntersecting && typeof element.inCallback === "function") {
 							logger.log("observers: observeIntersections: intersecting");
 							element.inCallback.call(entry);
-							if (typeof element.once !== "undefined" ? element.once : true) {
-								logger.log("observers: observeIntersections: disconnecting");
-								observer.unobserve(e);
-							}
+							ran = true;
+						} else if (typeof element.outCallback === "function") {
+							logger.log("observers: observeIntersections: outersecting");
+							element.outCallback.call(entry);
+							ran = true;
 						}
-
+						if (ran && (typeof element.once !== "undefined" ? element.once : true)) {
+							logger.log("observers: observeIntersections: disconnecting");
+							observer.unobserve(e);
+						}
 					});
 				}, {
 					root: element.root ? element.root : null,

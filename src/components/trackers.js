@@ -127,7 +127,7 @@ const ra_trackers = function (logger, config) {
 				//
 				if (config.devices.mobile) setSwipeEvents();
 				//
-				if (config.pageLoad) sendDimension("Page Load Event");
+				if (config.pageLoad) sendDimension("pageLoad event");
 				else logger.warn("trackers: track: pageLoad event not set");
 				//
 				if (config.hotjar) triggerHotjar();
@@ -139,9 +139,8 @@ const ra_trackers = function (logger, config) {
 				if (typeof config.intersectionObserverElements !== "undefined"  && config.intersectionObserverElements.length) {
 					config.intersectionObserverElements.forEach(e => observeIntersections({
 						...e,
-						inCallback: () => {
-							sendDimension(`intersection observed: ${e.tag}`)
-						}
+						inCallback: () => sendDimension(`intersection observed: ${e.tag}`),
+						outCallback: null
 					}));
 				} else logger.warn("trackers: track: intersectionObserverElements not set");
 			});
