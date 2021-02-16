@@ -18,7 +18,14 @@
 	"scripts": {
 		"clean": "rm dist/*",
 		"start": "parcel public/index.html",
-		"build-prod": "parcel build public/index.html"
+		"build-prod": "parcel build public/index.html --no-source-maps"
+	},
+	"targets": {
+		"browser": {
+			"engines": {
+				"browsers": ["> 1%", "not dead"]
+			}
+		}
 	},
 	"dependencies": {},
 	"devDependencies": {

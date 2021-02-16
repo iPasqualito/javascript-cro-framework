@@ -45,19 +45,26 @@ const ra_utils = (logger) => {
 
 		try {
 			const element = document.querySelector(parameters.selector);
-			if (element) callback(element);
-			else observers.observeMutations({
-				parent: parameters.parent,
-				child: parameters.selector,
-				tag: parameters.tag,
-				foundClass: parameters.foundClass,
-				disconnect: parameters.disconnect,
-				config: {
-					childList: true,
-					subtree: parameters.recursive,
-				},
-				callback: callback
-			});
+			if (element) {
+				logger.log("utils: awaitNode: Element already exists");
+				element.classList.add(parameters.foundClass)
+				callback(element);
+			}
+			else {
+				logger.log("utils: awaitNode: start mutation observer");
+				observers.observeMutations({
+					parent: parameters.parent,
+					child: parameters.selector,
+					tag: parameters.tag,
+					foundClass: parameters.foundClass,
+					disconnect: parameters.disconnect,
+					config: {
+						childList: true,
+						subtree: parameters.recursive,
+					},
+					callback: callback
+				});
+			}
 		} catch (error) {
 			logger.error("utils: awaitNode: error", error);
 		}
