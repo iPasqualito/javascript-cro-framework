@@ -26,29 +26,28 @@ const ra_trackers = function (logger, config) {
 	const trackElements = function (element) {  // courtesy of Michiel Kikkert, @Dutch_Guy
 
 		const errorStack = [];
+		const events = typeof element.events !== "undefined" ? element.events : [];
 
 		const handlerFactory = function (el) {
 			let counter = 0,
-				threshold = 0;
+				threshold = 0,
+				first = typeof el.first !== "undefined" ? el.first : true,
+				throttle = typeof el.throttle !== "undefined" ? el.throttle : 500;
 			return function (event) {
 				let currentTime = performance.now(),
 					found = false,
 					_selectors = document.querySelectorAll(el.selector);
-
-				//logger.log("ctrackers: urrentTime", currentTime);
-
 				_selectors.forEach(function (_selector) {
-					if (_selector !== null && el.events.includes(event.type) && (event.target.matches(el.selector) || _selector.contains(event.target))) {
+					if (_selector !== null && (event.target.matches(el.selector) || _selector.contains(event.target))) {
 						found = true;
 					}
 				});
 				if (!found) return;
 				if (threshold === 0) {
-					threshold = performance.now() + el.throttle;
-					//logger.log("ttrackers: hreshold", threshold);
-					if (el.first) {
+					threshold = currentTime + throttle;
+					if (first) {
 						execute();
-						el.first = false;
+						first = false;
 					}
 				}
 
@@ -65,7 +64,12 @@ const ra_trackers = function (logger, config) {
 		};
 		logger.info("trackers: trackElements", element);
 
-		element.events.forEach(e => {
+		if(events.length === 0){ // default device specific events
+			config.devices.desktop && events.push("mouseup");
+			config.devices.mobile && events.push("touchend");
+		}
+
+		events.forEach(e => {
 			try {
 				logger.log(`trackers: trackElements: ${e} eventListener starting for`, element.tag);
 				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)

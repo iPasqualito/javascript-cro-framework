@@ -18,18 +18,11 @@
 		pageLoad: false,
 		eventTrackerElements: [{
 			selector: ".container h1",
-			tag: "click on title element",
-			events: ["mousedown", "touchend"],
-			throttle: 500,
-			first: true
+			tag: "click on title element"
 		}],
 		intersectionObserverElements: [{
 			selector: "p.new",
 			tag: "new paragraph",
-			threshold: 1,
-			root: null,
-			rootMargin: "0px",
-			once: true
 		}]
 	};
 

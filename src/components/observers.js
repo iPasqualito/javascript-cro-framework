@@ -94,15 +94,15 @@ const ra_observers = function (logger) {
 						} else {
 							if (typeof element.outCallback === "function") element.outCallback.call(entry);
 						}
-						if (element.once) {
+						if (typeof element.once !== "undefined" ? element.once : true) {
 							logger.log("observers: observeIntersections: disconnecting.");
 							observer.unobserve(e);
 						}
 					});
 				}, {
-					root: element.root,
-					rootMargin: element.rootMargin,
-					threshold: element.threshold
+					root: element.root ? element.root : null,
+					rootMargin: element.rootMargin ? element.rootMargin : "0px",
+					threshold: element.threshold ? element.threshold : 1
 				});
 				observer.observe(e);
 			});
