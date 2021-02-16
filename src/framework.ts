@@ -3,11 +3,9 @@ import ra_utils from "./components/utils";
 import { ra_observers } from "./components/observers";
 import { ra_trackers } from "./components/trackers";
 import { ra_storage } from "./components/storage";
+import { CustomWindow } from './helpers/globalWindow';
 
-
-declare global {
-    interface Window { ra_framework: any; ra_mobile: any; }
-}
+declare let window: CustomWindow;
 
 window.ra_framework = function(config) {
 

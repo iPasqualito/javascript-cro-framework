@@ -1,8 +1,11 @@
 import { ra_observers } from "./observers";
+import { CustomWindow } from '../helpers/globalWindow';
+
+declare let window: CustomWindow;
 
 export const ra_trackers = function (logger, config) {
 
-	const observeIntersections = new ra_observers(logger).observeIntersections;
+	const observeIntersections = new (ra_observers(logger).observeIntersections as any);
 
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
@@ -25,7 +28,7 @@ export const ra_trackers = function (logger, config) {
 
 	const trackElements = function (element) {
 		// original function written by Michiel Kikkert, @Dutch_Guy
-		const errorStack = [];
+		const errorStack: any[] = [];
 		const events = typeof element.events !== "undefined" ? element.events : [];
 
 		const handlerFactory = function (el) {
@@ -72,8 +75,9 @@ export const ra_trackers = function (logger, config) {
 		events.forEach(e => {
 			try {
 				logger.log(`trackers: trackElements: ${e} eventListener starting for`, element.tag);
-				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
-			} catch (error) {
+				// @ts-ignore
+                document.querySelector("body").addEventListener(e, new (handlerFactory(element) as any), false)
+			} catch (error: any) {
 				errorStack.push[error];
 			}
 		});

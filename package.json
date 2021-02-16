@@ -24,8 +24,9 @@
 		"browser": {
 			"engines": {
 				"browsers": [
-					"> 1%",
-					"not dead"
+                  "last 2 versions",
+                  "last 1 year",
+                  "not safari 12.1"
 				]
 			}
 		}
