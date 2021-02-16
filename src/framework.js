@@ -15,9 +15,6 @@ window.ra_framework = function(config) {
 	const utils = new ra_utils(logger);
 	const mobile = window.ra_mobile = utils.isMobile();
 
-	console.log("- mobile:", mobile);
-	console.log("- window.mobile:", window.ra_mobile);
-
 	return {
 		init: callback => {
 			try {
