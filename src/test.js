@@ -2,10 +2,10 @@
 
 	const config = {
 		experiment: {
-			id: "ra-000",
+			id: "ra-frw",
 			name: "SiteWide - CRO Framework",
 			variation: {
-				id: "b",
+				id: "x",
 				name: "variant 1"
 			},
 		},
