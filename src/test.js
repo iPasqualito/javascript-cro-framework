@@ -16,14 +16,32 @@
 		},
 		hotjar: false,
 		pageLoad: false,
-		eventTrackerElements: [{
-			selector: ".container h1",
-			tag: "click on title element"
-		}],
-		intersectionObserverElements: [{
-			selector: "div.banner",
-			tag: "intersection test",
-		}]
+		eventTracker: {
+			active: false,
+			elements: [{
+				selector: "body",
+				tag: "body click"
+			}, {
+				selector: ".container h1",
+				tag: "hover title",
+				events: ["mouseover"],
+				throttle: 1000
+			}, {
+				selector: ".container p.elliot",
+				tag: "click on paragraph"
+			}, {
+				selector: "blorp",
+				tag: "blorp on blorp",
+				events: ["blorp"]
+			}]
+		},
+		intersectionObserver: {
+			active: false,
+			elements: [{
+				selector: "div.banner",
+				tag: "intersection test",
+			}]
+		}
 	};
 
 	const framework = new ra_framework(config);

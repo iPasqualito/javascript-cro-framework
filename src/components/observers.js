@@ -94,11 +94,11 @@ const ra_observers = function (logger) {
 					entries.forEach(function (entry) {
 						if (entry.isIntersecting && typeof element.inCallback === "function") {
 							logger.log("observers: observeIntersections: intersecting");
-							element.inCallback.call(entry);
+							element.inCallback(element);
 							ran = true;
 						} else if (typeof element.outCallback === "function") {
 							logger.log("observers: observeIntersections: outersecting");
-							element.outCallback.call(entry);
+							element.outCallback(element);
 							ran = true;
 						}
 						if (ran && (typeof element.once !== "undefined" ? element.once : true)) {

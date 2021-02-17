@@ -58,13 +58,13 @@ const ra_trackers = function (logger, config) {
 				function execute() {
 					counter++;
 					logger.log("trackers: handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
-					sendDimension(`${el.tag}`, false);
+					if (typeof element.callback === "function") element.callback();
 				}
 			};
 		};
 		logger.info("trackers: trackElements", element);
 
-		if(events.length === 0){ // default device specific events
+		if (events.length === 0) { // default device specific events
 			config.devices.desktop && !window.ra_mobile && events.push("mouseup");
 			config.devices.mobile && window.ra_mobile && events.push("touchend");
 		}
@@ -78,12 +78,8 @@ const ra_trackers = function (logger, config) {
 			}
 		});
 
-		if (errorStack.length) {
-			errorStack.forEach((entry, i) => logger.error(`trackers: trackElements error ${i}`, entry));
-			sendDimension("trackElements error(s) caught: " + errorStack.length + " error(s)");
-		} else {
-			sendDimension("trackElements active");
-		}
+		return errorStack;
+
 	};
 
 	const setSwipeEvents = function (t = window, e = document) {
@@ -128,21 +124,34 @@ const ra_trackers = function (logger, config) {
 				if (config.devices.mobile) setSwipeEvents();
 				//
 				if (config.pageLoad) sendDimension("pageLoad event");
-				else logger.warn("trackers: track: pageLoad event not set");
+				else logger.warn("trackers: track: pageLoad tracking disabled");
 				//
 				if (config.hotjar) triggerHotjar();
-				else logger.warn("trackers: track: hotjar not set");
+				else logger.warn("trackers: track: hotjar tracking disabled");
 				//
-				if (typeof config.eventTrackerElements !== "undefined" && config.eventTrackerElements.length) config.eventTrackerElements.forEach(e => trackElements(e));
-				else logger.warn("trackers: track: eventTrackerElements not set");
+				if (config.eventTracker.active && config.eventTracker.elements.length) {
+					const errors = [];
+					config.eventTracker.elements.forEach(e => {
+						errors.concat(trackElements({
+							...e,
+							callback: () => sendDimension(`${e.tag}`, false)
+						}))
+					});
+					if (errors.length) {
+						errors.forEach((error, i) => logger.error(`trackers: trackElements error ${i}`, error));
+						sendDimension("trackElements active, error(s) caught: " + errors.length + " error(s)");
+					} else {
+						sendDimension("trackElements active, no errors");
+					}
+				} else logger.warn("trackers: track: event tracking disabled");
 				//
-				if (typeof config.intersectionObserverElements !== "undefined"  && config.intersectionObserverElements.length) {
-					config.intersectionObserverElements.forEach(e => observeIntersections({
-						...e,
-						inCallback: () => sendDimension(`intersection observed: ${e.tag}`),
+				if (config.intersectionObserver.active && config.intersectionObserver.elements.length) {
+					config.intersectionObserver.elements.forEach(element => observeIntersections({
+						...element,
+						inCallback: (e) => sendDimension(`intersection observed: ${e.tag}`),
 						outCallback: null
 					}));
-				} else logger.warn("trackers: track: intersectionObserverElements not set");
+				} else logger.warn("trackers: track: intersection observer disabled");
 			});
 		}
 	}
