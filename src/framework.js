@@ -11,16 +11,19 @@ window.ra_framework = function(config) {
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug
 	});
 
-	const trackers = new ra_trackers(logger, config);
 	const utils = new ra_utils(logger);
-	const mobile = window.ra_mobile = utils.isMobile();
+
+	const touchSupport = utils.isTouchEnabled();
+	const screenSize = utils.getScreenSize();
+
+	const trackers = new ra_trackers(logger, config, touchSupport);
 
 	return {
 		init: callback => {
 			try {
 				if (config.debug) logger.warn("framework: init: Framework debugging activated", config);
 
-				if((config.devices.desktop && !mobile) || (config.devices.mobile && mobile)) {
+				if((config.devices.desktop && screenSize !== "small") || (config.devices.mobile && touchSupport && screenSize === "small")) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
@@ -36,7 +39,11 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
-		device: mobile ? "mobile" : "desktop",
+		environment: {
+			touchSupport: touchSupport,
+			screenSize: screenSize,
+			mobile: utils.isMobile()
+		},
 		storage: new ra_storage(logger),
 		observers: new ra_observers(logger),
 		sendDimension: trackers.sendDimension

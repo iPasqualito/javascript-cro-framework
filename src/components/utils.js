@@ -49,8 +49,7 @@ const ra_utils = (logger) => {
 				logger.log("utils: awaitNode: Element already exists");
 				element.classList.add(parameters.foundClass)
 				callback(element);
-			}
-			else {
+			} else {
 				logger.log("utils: awaitNode: start mutation observer");
 				observers.observeMutations({
 					parent: parameters.parent,
@@ -89,6 +88,19 @@ const ra_utils = (logger) => {
 		return url.toString();
 	};
 
+	const getScreenSize = (screenWidth = window.innerWidth) => {
+
+		logger.info("utils: getScreenSize", screenWidth);
+
+		return (screenWidth < 480 ? "small" : (screenWidth >= 480 && screenWidth <= 1024) ? "medium" : "large")
+	};
+
+	const isTouchEnabled = () => {
+
+		logger.info("utils: isTouchEnabled");
+
+		return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+	};
 	const isMobile = () => {
 
 		logger.info("utils: isMobile");
@@ -117,6 +129,8 @@ const ra_utils = (logger) => {
 		addStyle: addStyle,
 		awaitNode: awaitNode,
 		editQueryParam: editQueryParam,
+		getScreenSize: getScreenSize,
+		isTouchEnabled: isTouchEnabled,
 		isMobile: isMobile,
 		setElementProperties: setElementProperties
 	}

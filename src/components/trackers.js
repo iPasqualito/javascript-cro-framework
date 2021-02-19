@@ -1,6 +1,7 @@
 import ra_observers from "./observers";
+import ra_utils from "./utils";
 
-const ra_trackers = function (logger, config) {
+const ra_trackers = function (logger, config, touchSupported) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
@@ -64,10 +65,7 @@ const ra_trackers = function (logger, config) {
 		};
 		logger.info("trackers: trackElements", element);
 
-		if (events.length === 0) { // default device specific events
-			config.devices.desktop && !window.ra_mobile && events.push("mouseup");
-			config.devices.mobile && window.ra_mobile && events.push("touchend");
-		}
+		if (events.length === 0) events.push(touchSupported ? "touchend" : "mouseup"); // default device specific events
 
 		events.forEach(e => {
 			try {
@@ -114,7 +112,7 @@ const ra_trackers = function (logger, config) {
 
 	return {
 		sendDimension: sendDimension,
-		track: function (mobile) {
+		track: function () {
 
 			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));

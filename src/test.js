@@ -17,7 +17,7 @@
 		hotjar: false,
 		pageLoad: false,
 		eventTracker: {
-			active: false,
+			active: true,
 			elements: [{
 				selector: "body",
 				tag: "body click"
@@ -47,6 +47,8 @@
 	const framework = new ra_framework(config);
 
 	framework.init(() => {
+
+		console.log(framework.environment);
 
 		const changeDom = element => {
 
