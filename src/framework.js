@@ -23,6 +23,8 @@ window.ra_framework = function(config) {
 			try {
 				if (config.debug) logger.warn("framework: init: Framework debugging activated", config);
 
+				// todo: better device handling. don't run when device rules not met.
+
 				if((config.devices.desktop && screenSize !== "small") || (config.devices.mobile && touchSupport && screenSize === "small")) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
