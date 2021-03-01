@@ -11,7 +11,7 @@
 		},
 		debug: true,
 		devices: {
-			mobile: true,
+			mobile: false,
 			desktop: true
 		},
 		hotjar: false,
@@ -36,7 +36,7 @@
 			}]
 		},
 		intersectionObserver: {
-			active: false,
+			active: true,
 			elements: [{
 				selector: "div.banner",
 				tag: "intersection test",
@@ -67,7 +67,8 @@
 				"p",
 				{
 					class: "elliot new",
-					innerText: "The test code picked that up and put me here..."
+					innerText: "The test code picked that up and put me here...",
+					onclick: (event) => framework.logger.info("element click", event)
 				},
 				"afterend",
 				element // target element

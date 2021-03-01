@@ -119,7 +119,7 @@ const ra_trackers = function (logger, config, touchSupported) {
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
 				//
-				if (config.devices.mobile) setSwipeEvents();
+				if (config.devices.mobile && touchSupported) setSwipeEvents();
 				//
 				if (config.pageLoad) sendDimension("pageLoad event");
 				else logger.warn("trackers: track: pageLoad tracking disabled");

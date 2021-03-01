@@ -118,6 +118,11 @@ const ra_utils = (logger) => {
 		// iterate through each property
 		Object.entries(attributes).map(([key, value]) => {
 			// match innerText, innerHTML or event attributes
+
+			console.log("key", key);
+			console.log("test", (/^(inner|on)\w+$/i.test(key)));
+			console.log("attr[key]", attributes[key]);
+
 			if (/^(inner|on)\w+$/i.test(key)) element[key] = attributes[key]
 			// else just set the attribute
 			else element.setAttribute(key, value)
