@@ -4,9 +4,9 @@ const ra_utils = (logger) => {
 
 	const observers = new ra_observers(logger);
 
-	const addNode = (tagName, attributes, position, target) => {
+	const addNodes = nodes => nodes.map(({tagName, attributes, position, target}) => {
 
-		logger.info("utils: addNode", [tagName, attributes, position, target]);
+		logger.info("utils: addNodes", [tagName, attributes, position, target]);
 
 		const node = document.createElement(tagName);
 		setElementProperties(node, attributes);
@@ -17,7 +17,7 @@ const ra_utils = (logger) => {
 		}
 
 		return node;
-	};
+	});
 
 	const addStyle = (css, id) => {
 
@@ -27,12 +27,17 @@ const ra_utils = (logger) => {
 			if (document.getElementById(id)) {
 				logger.warn("utils: addStyle: StyleSheet already exists in DOM");
 			} else {
-				const link = addNode('style', {
-					id: id,
-					rel: "stylesheet",
-					type: "text/css"
-				}, "beforeend", document.head);
-				link.appendChild(document.createTextNode(css));
+				const link = addNodes([{
+					tagName: 'style',
+					attributes: {
+						id: id,
+						rel: "stylesheet",
+						type: "text/css"
+					},
+					position: "beforeend",
+					target: document.head
+				}]);
+				link[0].appendChild(document.createTextNode(css));
 			}
 		} catch (error) {
 			logger.error("utils: addStyle: error", error);
@@ -117,12 +122,7 @@ const ra_utils = (logger) => {
 		logger.info("utils: setElementProperties", [element, attributes]);
 		// iterate through each property
 		Object.entries(attributes).map(([key, value]) => {
-			// match innerText, innerHTML or event attributes
-
-			console.log("key", key);
-			console.log("test", (/^(inner|on)\w+$/i.test(key)));
-			console.log("attr[key]", attributes[key]);
-
+			// match innerText, innerHTML or event attributes (event attributes should be wrapped functions!)
 			if (/^(inner|on)\w+$/i.test(key)) element[key] = attributes[key]
 			// else just set the attribute
 			else element.setAttribute(key, value)
@@ -130,7 +130,7 @@ const ra_utils = (logger) => {
 	};
 
 	return {
-		addNode: addNode,
+		addNodes: addNodes,
 		addStyle: addStyle,
 		awaitNode: awaitNode,
 		editQueryParam: editQueryParam,

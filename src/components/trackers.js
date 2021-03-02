@@ -1,7 +1,7 @@
 import ra_observers from "./observers";
 import ra_utils from "./utils";
 
-const ra_trackers = function (logger, config, touchSupported) {
+const ra_trackers = function (logger, config, environment) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
@@ -35,14 +35,23 @@ const ra_trackers = function (logger, config, touchSupported) {
 				first = typeof el.first !== "undefined" ? el.first : true,
 				throttle = typeof el.throttle !== "undefined" ? el.throttle : 500;
 			return function (event) {
+
 				let currentTime = performance.now(),
 					found = false,
 					_selectors = document.querySelectorAll(el.selector);
+
+				const execute = () => {
+					counter++;
+					logger.log("trackers: handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
+					if (typeof element.callback === "function") element.callback();
+				}
+
 				_selectors.forEach(function (_selector) {
 					if (_selector !== null && (event.target.matches(el.selector) || _selector.contains(event.target))) {
 						found = true;
 					}
 				});
+
 				if (!found) return;
 				if (threshold === 0) {
 					threshold = currentTime + throttle;
@@ -56,16 +65,12 @@ const ra_trackers = function (logger, config, touchSupported) {
 				threshold = 0;
 				execute();
 
-				function execute() {
-					counter++;
-					logger.log("trackers: handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
-					if (typeof element.callback === "function") element.callback();
-				}
 			};
 		};
 		logger.info("trackers: trackElements", element);
 
-		if (events.length === 0) events.push(touchSupported ? "touchend" : "mouseup"); // default device specific events
+		if (!events.length && config.devices.mobile) events.push("touchend");
+		if (!events.length && config.devices.desktop) events.push("mouseup");
 
 		events.forEach(e => {
 			try {
@@ -119,7 +124,7 @@ const ra_trackers = function (logger, config, touchSupported) {
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
 				//
-				if (config.devices.mobile && touchSupported) setSwipeEvents();
+				if (config.devices.mobile && environment.touchSupport) setSwipeEvents();
 				//
 				if (config.pageLoad) sendDimension("pageLoad event");
 				else logger.warn("trackers: track: pageLoad tracking disabled");

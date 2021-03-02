@@ -13,25 +13,26 @@ window.ra_framework = function(config) {
 
 	const utils = new ra_utils(logger);
 
-	const touchSupport = utils.isTouchEnabled();
-	const screenSize = utils.getScreenSize();
-	const mobile = utils.isMobile();
+	const environment = {
+		touchSupport:  utils.isTouchEnabled(),
+		screenSize: utils.getScreenSize(),
+		mobile: utils.isMobile()
+	};
 
-	const trackers = new ra_trackers(logger, config, touchSupport);
+	const trackers = new ra_trackers(logger, config, environment);
 
 	return {
 		init: callback => {
 			try {
 				let passed = false;
-
-				if (config.debug) logger.warn("framework: init: Framework debugging activated", config);
-
+				logger.info("framework: init: start", config);
+				if (config.debug) logger.warn("framework: init: Warning: debug active");
 				// everything that is NOT a small screen will be treated like a desktop ( tablets too )
-				if (config.devices.desktop && screenSize !== "small") passed = true;
+				if (config.devices.desktop && environment.screenSize !== "small") passed = true;
 				// everything that is mobile, supports touch, and has a small screen will be treated like a mobile phone ( tablets too )
-			    if (config.devices.mobile && mobile && touchSupport && screenSize === "small") passed = true;
+			    if (config.devices.mobile && environment.mobile && environment.touchSupport && environment.screenSize === "small") passed = true;
 
-			    if(passed) {
+			    if( passed ) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
@@ -47,11 +48,7 @@ window.ra_framework = function(config) {
 		},
 		logger: logger,
 		utils: utils,
-		environment: {
-			touchSupport: touchSupport,
-			screenSize: screenSize,
-			mobile: mobile
-		},
+		environment: environment,
 		storage: new ra_storage(logger),
 		observers: new ra_observers(logger),
 		sendDimension: trackers.sendDimension

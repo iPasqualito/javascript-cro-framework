@@ -63,16 +63,25 @@
 			`, `ra-cro-style`);
 
 			framework.logger.info("element loaded", element);
-			framework.utils.addNode(
-				"p",
-				{
+			framework.utils.addNodes([{
+				tagName: "p",
+				attributes: {
 					class: "elliot new",
-					innerText: "The test code picked that up and put me here...",
-					onclick: (event) => framework.logger.info("element click", event)
+					innerText: "The test code picked that up and put me here first...",
+					onclick: (event) => framework.logger.info("element 1 click", event)
 				},
-				"afterend",
-				element // target element
-			);
+				position: "beforebegin",
+				target: element
+			}, {
+				tagName: "p",
+				attributes: {
+					class: "elliot new",
+					innerText: "The test code picked that up and put me here second...",
+					onclick: (event) => framework.logger.info("element 2 click", event)
+				},
+				position: "afterend",
+				target: element
+			}]);
 		}
 
 		framework.utils.awaitNode({
