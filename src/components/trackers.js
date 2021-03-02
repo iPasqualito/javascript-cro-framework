@@ -45,7 +45,11 @@ const ra_trackers = function (logger, config, environment) {
 					if (typeof element.callback === "function") element.callback();
 				}
 
-				selectors.forEach(selector => found = (selector !== null && (event.target.matches(el.selector) || selector.contains(event.target))));
+				selectors.forEach(selector => found = (
+					selector !== null && (
+						event.target.matches(el.selector) || selector.contains(event.target))
+					)
+				);
 
 				if (!found) return;
 				if (threshold === 0) {
