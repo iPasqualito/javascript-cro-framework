@@ -1,5 +1,4 @@
 import ra_observers from "./observers";
-import ra_utils from "./utils";
 
 const ra_trackers = function (logger, config, environment) {
 
@@ -8,7 +7,7 @@ const ra_trackers = function (logger, config, environment) {
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
-			event: eventNonInteraction ? `trackEventNI` : `trackEvent`, // if eventNonInteraction is not set default to trackEventNI
+			event: eventNonInteraction ? `trackEventNI` : `trackEvent`,
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
 			eventAction: eventAction,
 			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
@@ -38,19 +37,15 @@ const ra_trackers = function (logger, config, environment) {
 
 				let currentTime = performance.now(),
 					found = false,
-					_selectors = document.querySelectorAll(el.selector);
+					selectors = document.querySelectorAll(el.selector);
 
 				const execute = () => {
 					counter++;
-					logger.log("trackers: handlerFactory: custom event #" + counter + " tracked", el.tag + " [" + event.type + "]");
+					logger.log(`trackers: handlerFactory: custom event #${counter} tracked`, el.tag + ` [${event.type}]`);
 					if (typeof element.callback === "function") element.callback();
 				}
 
-				_selectors.forEach(function (_selector) {
-					if (_selector !== null && (event.target.matches(el.selector) || _selector.contains(event.target))) {
-						found = true;
-					}
-				});
+				selectors.forEach(selector => found = (selector !== null && (event.target.matches(el.selector) || selector.contains(event.target))));
 
 				if (!found) return;
 				if (threshold === 0) {

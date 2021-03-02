@@ -48,8 +48,6 @@
 
 	framework.init(() => {
 
-		console.log(framework.environment);
-
 		const changeDom = element => {
 
 			framework.utils.addStyle(`
