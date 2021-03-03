@@ -46,40 +46,25 @@
 
 	const framework = new ra_framework(config);
 
+	const newURL = framework.utils.editQueryParam({
+		"framework": "awesome"
+	});
+
+	framework.logger.log("newURL", newURL);
+
 	framework.init(() => {
 
 		const changeDom = element => {
 
-			framework.utils.addStyle(`
-				p.elliot.new {
-					font-size: 1em;
-					border: 1px solid white;
-					border-radius:5px;
-					margin-top: 24px;
-					padding: 12px 48px;
-				}
-			`, `ra-cro-style`);
+	framework.utils.setElementProperties(element, {
+		// all HTML attributes are supported :)
+		id: "nameofid",
+		innerHTML: `<div>Yes you can add innerHTML</div>`,
+		onmouseenter: () => {
+			// make sure this is a function
+		}
+	})
 
-			framework.logger.info("element loaded", element);
-			framework.utils.addNodes([{
-				tagName: "p",
-				attributes: {
-					class: "elliot new",
-					innerText: "The test code picked that up and put me here first...",
-					onclick: (event) => framework.logger.info("element 1 click", event)
-				},
-				position: "beforebegin",
-				target: element
-			}, {
-				tagName: "p",
-				attributes: {
-					class: "elliot new",
-					innerText: "The test code picked that up and put me here second...",
-					onclick: (event) => framework.logger.info("element 2 click", event)
-				},
-				position: "afterend",
-				target: element
-			}]);
 		}
 
 		framework.utils.awaitNode({
@@ -92,13 +77,11 @@
 		}, element => {         // function to run after element is found
 			try {
 				changeDom(element);
-			} catch (error) {
-				framework.logger.error("an error occurred", error);
-			} finally {
 				framework.sendDimension(`experiment ${config.experiment.id}${config.experiment.variation.id} loaded`);
 				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
+			} catch (error) {
+				framework.logger.error("an error occurred", error);
 			}
-
 		});
 
 	});

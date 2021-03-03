@@ -27,7 +27,7 @@ const ra_utils = (logger) => {
 			if (document.getElementById(id)) {
 				logger.warn("utils: addStyle: StyleSheet already exists in DOM");
 			} else {
-				const link = addNodes([{
+				const [ link ] = addNodes([{
 					tagName: 'style',
 					attributes: {
 						id: id,
@@ -37,7 +37,10 @@ const ra_utils = (logger) => {
 					position: "beforeend",
 					target: document.head
 				}]);
-				link[0].appendChild(document.createTextNode(css));
+				link.appendChild(document.createTextNode(css));
+
+				return link;
+
 			}
 		} catch (error) {
 			logger.error("utils: addStyle: error", error);

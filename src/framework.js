@@ -29,7 +29,7 @@ window.ra_framework = function(config) {
 				if (config.debug) logger.warn("framework: init: Warning: debug active");
 				// everything that is NOT a small screen will be treated like a desktop ( tablets too )
 				if (config.devices.desktop && environment.screenSize !== "small") passed = true;
-				// everything that is mobile, supports touch, and has a small screen will be treated like a mobile phone ( tablets too )
+				// everything that is mobile, supports touch, and has a small screen will be treated like a mobile phone
 			    if (config.devices.mobile && environment.mobile && environment.touchSupport && environment.screenSize === "small") passed = true;
 
 			    if( passed ) {

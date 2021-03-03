@@ -46,8 +46,8 @@ const ra_trackers = function (logger, config, environment) {
 				}
 
 				selectors.forEach(selector => found = (
-					selector !== null && (
-						event.target.matches(el.selector) || selector.contains(event.target))
+						selector !== null && (
+							event.target.matches(el.selector) || selector.contains(event.target))
 					)
 				);
 
@@ -68,8 +68,13 @@ const ra_trackers = function (logger, config, environment) {
 		};
 		logger.info("trackers: trackElements", element);
 
-		if (!events.length && config.devices.mobile) events.push("touchend");
-		if (!events.length && config.devices.desktop) events.push("mouseup");
+		if (!events.length) {
+			if (config.devices.mobile && environment.screenSize === "small" && environment.touchSupport) events.push("touchend"); // smartphone
+			if (config.devices.desktop && environment.screenSize !== "small") {
+				if (environment.touchSupport) events.push("touchend"); // tablet
+				else events.push("mouseup"); // desktop
+			}
+		}
 
 		events.forEach(e => {
 			try {
