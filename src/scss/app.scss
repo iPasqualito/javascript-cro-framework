@@ -7,7 +7,7 @@ $primary-color: #ff8800;
 }
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Roboto;
 	background: $primary-color;
 	color: #fff;
 	line-height: 1.5;
@@ -30,5 +30,13 @@ ul {
 }
 .banner {
 	height: 240px;
+	margin: 40px 0;
+	border: 3px solid #8f0
+}
 
+button {
+	padding: 10px;
+	background: white;
+	border: 1px solid #0088ff;
+	border-radius: 5px;
 }

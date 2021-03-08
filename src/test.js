@@ -17,7 +17,7 @@
 		hotjar: false,
 		pageLoad: false,
 		eventTracker: {
-			active: true,
+			active: false,
 			elements: [{
 				selector: "body",
 				tag: "body click"
@@ -46,24 +46,30 @@
 
 	const framework = new ra_framework(config);
 
-	const newURL = framework.utils.editQueryParam({
-		"framework": "awesome"
-	});
-
-	framework.logger.log("newURL", newURL);
-
 	framework.init(() => {
 
 		const changeDom = element => {
 
-	framework.utils.setElementProperties(element, {
-		// all HTML attributes are supported :)
-		id: "nameofid",
-		innerHTML: `<div>Yes you can add innerHTML</div>`,
-		onmouseenter: () => {
-			// make sure this is a function
-		}
-	})
+			framework.observers.observeMutations({
+				parent: d.body,         // Set to true to extend monitoring to the entire subtree of nodes rooted at target.
+				child: "div.banner",    // The element we want to observe mutations on.
+				attributeName: "class",
+				config: {
+					childList: false,   // Set to true to monitor the target node
+				                        // and, if subtree is true, its descendants) for the addition of new child nodes or removal of existing child nodes. The default value is false.
+					subtree: true,      // Set to true to extend monitoring to the entire
+				                        // subtree of nodes rooted at target.
+					attributes: true,   // set to true to listen to attribute changes
+					attributeFilter: ["class"], // An array of specific attribute names to be monitored.
+					attributeOldValue: true,
+					characterData: false,   // Set to true to monitor the specified target node (and, if subtree is true,
+				                            // its descendants) for changes to the character data
+					characterDataOldValue: false    // Set to true to record the previous value of a node's text
+				                                    // whenever the text changes on nodes being monitored.
+				},
+				// function to run when mutation is observed.
+				callback: element => framework.logger.log("change picked up!", element)
+			});
 
 		}
 
@@ -83,6 +89,8 @@
 				framework.logger.error("an error occurred", error);
 			}
 		});
+
+		framework.sendDimension(`End of Manual Reached`, false);
 
 	});
 

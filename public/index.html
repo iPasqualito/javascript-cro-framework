@@ -11,18 +11,25 @@
 <body>
 <div class="container">
 	<h1>recoveryArea Framework Test Page</h1>
+	<button>Click me to add a class to the banner</button>
 </div>
 <div class="banner">
 	<p>This one gets picked up by the intersection observer...</p>
 </div>
 <script>
-	setTimeout(() => {
-		const element = document.createElement("p");
-		element.innerText = "This element was added to the DOM...";
-		element.id ="elliot";
-		element.style.fontSize = "1em";
-		document.querySelector(".container").appendChild(element);
-	}, 1500);
+
+	(d => {
+		setTimeout(() => {
+			const element = d.createElement("p");
+			element.innerText = "This element was added to the DOM...";
+			element.id ="elliot";
+			element.style.fontSize = "1em";
+			d.querySelector(".container").appendChild(element);
+		}, 1500);
+		d.querySelector(".container button").addEventListener("click", () => d.querySelector("div.banner").classList.toggle("pickupClass"));
+
+	})(document)
+
 </script>
 </body>
 </html>
