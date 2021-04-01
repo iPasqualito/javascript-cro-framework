@@ -6,6 +6,8 @@ import ra_storage from "./components/storage";
 
 window.ra_framework = function(config) {
 
+	// todo: addNodes: return single element instead of array if only one element created
+
 	const logger = new ra_logger({
 		experiment: config.experiment,
 		debug: (window.location.hash === "#ra-debug") ? true : config.debug

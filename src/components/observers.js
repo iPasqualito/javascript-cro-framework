@@ -3,7 +3,7 @@ const ra_observers = function (logger) {
 	return {
 		observeMutations: function (parameters) {
 
-			logger.info("observers: observeMutations", parameters);
+			logger.info(`observers: observeMutations`, parameters);
 			let found = false;
 
 			const handleMutation = function (mutation) {
@@ -20,7 +20,7 @@ const ra_observers = function (logger) {
 						nodeList = getNodeList(mutation.addedNodes);
 						for (let node of nodeList) {
 							found = true;
-							logger.log("observers: observeMutations: added element:", node);
+							logger.log(`observers: observeMutations: added element:`, node);
 							node.classList.add(parameters.foundClass);
 							parameters.callback(node);
 						}
@@ -28,7 +28,7 @@ const ra_observers = function (logger) {
 						nodeList = getNodeList(mutation.removedNodes);
 						for (let node of nodeList) {
 							found = true;
-							logger.log("observers: observeMutations: removed element:", node);
+							logger.log(`observers: observeMutations: removed element:`, node);
 							parameters.callback(node);
 						}
 					}
@@ -38,14 +38,15 @@ const ra_observers = function (logger) {
 					const mtParent = mutation.target.parentElement;
 					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === parameters.child) {
 						found = true;
-						logger.log("observers: observeMutations: element characterData changed from " + mutation.oldValue + " to " + mtParent.nodeValue, mutation);
+						logger.log(`observers: observeMutations: element characterData changed from "${mutation.oldValue}" to "${mtParent.nodeValue}"`, mutation);
 						parameters.callback(mutation.target);
 					}
 				};
+
 				const handleAttributes = mutation => {
 					if (getNode(children, mutation.target)) {
 						found = true;
-						logger.log("observers: observeMutations: element " + mutation.attributeName + " attribute changed from " + mutation.oldValue + " to " + mutation.target.getAttribute(parameters.attributeName));
+						logger.log(`observers: observeMutations: element ${mutation.attributeName}-attribute changed from "${mutation.oldValue}" to "${mutation.target.getAttribute(parameters.attributeName)}"`);
 						parameters.callback(mutation.target);
 					}
 				};
@@ -61,7 +62,7 @@ const ra_observers = function (logger) {
 						handleAttributes(mutation);
 						break;
 					default:
-						logger.log("observers: observeMutations: I have never heard of that fruit...");
+						logger.log(`observers: observeMutations: I have never heard of that fruit...`);
 				}
 			};
 
@@ -70,11 +71,11 @@ const ra_observers = function (logger) {
 					try {
 						handleMutation(mutation);
 					} catch (error) {
-						logger.error("observers: observeMutations: error caught", error);
+						logger.error(`observers: observeMutations: error caught`, error);
 					}
 				});
 				if (found && parameters.disconnect) {
-					logger.log("observers: observeMutations: disconnecting, goodbye.");
+					logger.log(`observers: observeMutations: disconnecting, goodbye.`);
 					observer.disconnect();
 				}
 			});
@@ -97,7 +98,7 @@ const ra_observers = function (logger) {
 							element.inCallback(element);
 							ran = true;
 						} else if (typeof element.outCallback === "function") {
-							logger.log("observers: observeIntersections: outersecting");
+							logger.log("observers: observeIntersections: not intersecting");
 							element.outCallback(element);
 							ran = true;
 						}
