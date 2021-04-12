@@ -9,6 +9,7 @@
 				name: "variant 1"
 			},
 		},
+		//development: true,
 		debug: true,
 		devices: {
 			mobile: false,
@@ -17,7 +18,7 @@
 		hotjar: false,
 		pageLoad: false,
 		eventTracker: {
-			active: false,
+			active: true,
 			elements: [{
 				selector: "body",
 				tag: "body click"
@@ -50,6 +51,8 @@
 
 		const changeDom = element => {
 
+			console.log("element loaded", element)
+
 			framework.observers.observeMutations({
 				parent: d.body,         // Set to true to extend monitoring to the entire subtree of nodes rooted at target.
 				child: "div.banner",    // The element we want to observe mutations on.
@@ -68,7 +71,7 @@
 				                                    // whenever the text changes on nodes being monitored.
 				},
 				// function to run when mutation is observed.
-				callback: element => framework.logger.log("change picked up!", element)
+				callback: element => console.log("change picked up!", element)
 			});
 
 		}
@@ -78,7 +81,7 @@
 			tag: "elliot paragraph",    // tag it for identification
 			foundClass: "found",        // add a class when it's found
 			parent: d,                  // the parent element, narrow the scope
-			recursive: true,            // search the whole tree or just the parent
+			recursive: true,            // search the whole tree or just the parent, true by default
 			disconnect: true            // stop looking when element is found
 		}, element => {         // function to run after element is found
 			try {

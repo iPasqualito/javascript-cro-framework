@@ -76,6 +76,8 @@ const ra_trackers = function (logger, config, environment) {
 			}
 		}
 
+		if(!events.length) events.push("click");
+
 		events.forEach(e => {
 			try {
 				logger.log(`trackers: trackElements: ${e} eventListener starting for`, element.tag);

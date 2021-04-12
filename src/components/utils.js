@@ -52,26 +52,20 @@ const ra_utils = (logger) => {
 		logger.info("utils: awaitNode", [parameters, callback]);
 
 		try {
-			const element = document.querySelector(parameters.selector);
-			if (element) {
-				logger.log("utils: awaitNode: Element already exists");
-				element.classList.add(parameters.foundClass)
-				callback(element);
-			} else {
-				logger.log("utils: awaitNode: start mutation observer");
-				observers.observeMutations({
-					parent: parameters.parent,
-					child: parameters.selector,
-					tag: parameters.tag,
-					foundClass: parameters.foundClass,
-					disconnect: parameters.disconnect,
-					config: {
-						childList: true,
-						subtree: parameters.recursive,
-					},
-					callback: callback
-				});
-			}
+			const found = typeof parameters.foundClass !== "undefined" ? parameters.foundClass : "ra-fwk-found";
+			new MutationObserver(function () {
+				const el = document.querySelector(parameters.selector + ":not(." + found + ")");
+				if (el) {
+					logger.log("utils: awaitNode: element found", parameters.tag);
+					el.classList.add(found);
+					parameters.disconnect && this.disconnect();
+					callback(el);
+				}
+			}).observe(parameters.parent || document, {
+				subtree: parameters.recursive || true,
+				childList: parameters.childList || true
+			});
+
 		} catch (error) {
 			logger.error("utils: awaitNode: error", error);
 		}

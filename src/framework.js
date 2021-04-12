@@ -6,35 +6,43 @@ import ra_storage from "./components/storage";
 
 window.ra_framework = function(config) {
 
-	// todo: addNodes: return single element instead of array if only one element created
+	const environment = {
+		development: "development" in config ? config.development : false,
+		debug: window.location.hash === "#ra-debug" ? true : config.debug,
+		touchSupport: null,
+		screenSize: null,
+		mobile: null
+	};
 
 	const logger = new ra_logger({
 		experiment: config.experiment,
-		debug: (window.location.hash === "#ra-debug") ? true : config.debug
+		debug: environment.debug
 	});
 
 	const utils = new ra_utils(logger);
 
-	const environment = {
-		touchSupport:  utils.isTouchEnabled(),
-		screenSize: utils.getScreenSize(),
-		mobile: utils.isMobile()
-	};
+	environment.touchSupport =  utils.isTouchEnabled();
+	environment.screenSize = utils.getScreenSize();
+	environment.mobile = utils.isMobile();
 
 	const trackers = new ra_trackers(logger, config, environment);
+
+	logger.info("framework environment:", environment);
 
 	return {
 		init: callback => {
 			try {
 				let passed = false;
 				logger.info("framework: init: start", config);
-				if (config.debug) logger.warn("framework: init: Warning: debug active");
+				if (environment.debug) logger.warn("framework: init: Warning: debug active");
 				// everything that is NOT a small screen will be treated like a desktop ( tablets too )
 				if (config.devices.desktop && environment.screenSize !== "small") passed = true;
 				// everything that is mobile, supports touch, and has a small screen will be treated like a mobile phone
-			    if (config.devices.mobile && environment.mobile && environment.touchSupport && environment.screenSize === "small") passed = true;
-
-			    if( passed ) {
+				if (config.devices.mobile && environment.mobile && environment.touchSupport && environment.screenSize === "small") passed = true;
+				// override device settings when we're in development mode.
+				if (environment.development) passed = true;
+				// only run if all tests are passed..
+				if( passed ) {
 					trackers.track();
 					if(typeof callback === "function") callback.call();
 				} else {
@@ -57,3 +65,4 @@ window.ra_framework = function(config) {
 	}
 
 }
+
