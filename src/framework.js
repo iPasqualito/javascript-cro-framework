@@ -7,6 +7,7 @@ import ra_storage from "./components/storage";
 window.ra_framework = function(config) {
 
 	const environment = {
+		version: "4.1",
 		development: "development" in config ? config.development : false,
 		debug: window.location.hash === "#ra-debug" ? true : config.debug,
 		touchSupport: null,
