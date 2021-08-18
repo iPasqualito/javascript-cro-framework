@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 ((w, d) => {
 
 	const config = {
@@ -53,6 +55,21 @@
 
 			console.log("element loaded", element)
 
+			framework.utils.addNodes([{
+				tagName: "details",
+				attributes: {
+					class: "ra-frmwrk-overlay",
+					style: "background-color:green;",
+					innerHTML: `<p>This is a test to see if we can remove an attribute</p>`
+				},
+				position: "afterend",
+				target: element
+			}])
+
+			framework.utils.setElementProperties(d.querySelector("h1"), {
+				"data-test": null,
+			})
+
 			framework.observers.observeMutations({
 				parent: d.body,         // Set to true to extend monitoring to the entire subtree of nodes rooted at target.
 				child: "div.banner",    // The element we want to observe mutations on.
@@ -80,7 +97,6 @@
 			selector: "p#elliot",       // the element we're looking for
 			tag: "elliot paragraph",    // tag it for identification
 			foundClass: "found",        // add a class when it's found
-			parent: d,                  // the parent element, narrow the scope
 			recursive: true,            // search the whole tree or just the parent, true by default
 			disconnect: true            // stop looking when element is found
 		}, element => {         // function to run after element is found

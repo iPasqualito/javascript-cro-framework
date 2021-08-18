@@ -46,8 +46,8 @@ const ra_trackers = function (logger, config, environment) {
 				}
 
 				selectors.forEach(selector => found = (
-						selector !== null && (
-							event.target.matches(el.selector) || selector.contains(event.target))
+					selector !== null && (
+						event.target.matches(el.selector) || selector.contains(event.target))
 					)
 				);
 
@@ -59,7 +59,6 @@ const ra_trackers = function (logger, config, environment) {
 						first = false;
 					}
 				}
-
 				if (threshold > currentTime) return;
 				threshold = 0;
 				execute();
@@ -123,6 +122,7 @@ const ra_trackers = function (logger, config, environment) {
 
 	return {
 		sendDimension: sendDimension,
+		triggerHotjar: triggerHotjar,
 		track: function () {
 
 			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
@@ -132,8 +132,8 @@ const ra_trackers = function (logger, config, environment) {
 				//
 				if (config.devices.mobile && environment.touchSupport) setSwipeEvents();
 				//
-				if (config.pageLoad) sendDimension("pageLoad event");
-				else logger.warn("trackers: track: pageLoad tracking disabled");
+				//if (config.pageLoad) sendDimension("pageLoad event");
+				//else logger.warn("trackers: track: pageLoad tracking disabled");
 				//
 				if (config.hotjar) triggerHotjar();
 				else logger.warn("trackers: track: hotjar tracking disabled");

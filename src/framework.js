@@ -7,7 +7,7 @@ import ra_storage from "./components/storage";
 window.ra_framework = function(config) {
 
 	const environment = {
-		version: "4.1",
+		version: "4.1.1",
 		development: "development" in config ? config.development : false,
 		debug: window.location.hash === "#ra-debug" ? true : config.debug,
 		touchSupport: null,
@@ -54,6 +54,13 @@ window.ra_framework = function(config) {
 				logger.error("framework: init: error caught", error);
 			}
 			finally {
+				// maybe it's smart to do the pageLoad event here?
+				// Independent from the test code,
+				// just set an event so we know we have been here
+				//
+				if (config.pageLoad) trackers.sendDimension("pageLoad event");
+				else logger.warn("framework: init: pageLoad tracking disabled");
+
 				logger.log("framework: init: done");
 			}
 		},
