@@ -1,6 +1,6 @@
 {
 	"name": "javascript-cro-framework",
-	"version": "1.0.0",
+	"version": "4.1.1",
 	"description": "AB Testing Framework",
 	"main": "framework.js",
 	"keywords": [],
