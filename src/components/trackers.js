@@ -4,7 +4,7 @@ const ra_trackers = function (logger, config, environment) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
-	const sendDimension = function (eventAction, eventNonInteraction = true) {
+	const sendDimension = window.ra_sendDimension || function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
 			event: eventNonInteraction ? `trackEventNI` : `trackEvent`,

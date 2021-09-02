@@ -2,6 +2,16 @@
 
 ((w, d) => {
 
+	window.ra_sendDimension = function (eventAction, eventNonInteraction = true) {
+		(window.dataLayer = window.dataLayer || []).push({
+			event: 'genericEvent',
+			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
+			eventAction: eventAction,
+			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
+			eventNonInteraction: eventNonInteraction // if not sent default to true
+		});
+	};
+
 	const config = {
 		experiment: {
 			id: "ra-frw",
@@ -11,14 +21,18 @@
 				name: "variant 1"
 			},
 		},
-		//development: true,
+		development: true,
 		debug: true,
 		devices: {
 			mobile: false,
 			desktop: true
 		},
 		hotjar: false,
-		pageLoad: false,
+		pageLoad: {
+			track: true,
+			// pass the condition we want to test as a string
+			condition: 'document.body.classList.contains("awesome")'
+		},
 		eventTracker: {
 			active: true,
 			elements: [{
@@ -44,7 +58,8 @@
 				selector: "div.banner",
 				tag: "intersection test",
 			}]
-		}
+		},
+
 	};
 
 	const framework = new ra_framework(config);
