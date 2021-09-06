@@ -25,7 +25,7 @@ const ra_trackers = function (logger, config, environment) {
 
 	const triggerMouseFlow = function () {
 		logger.info("trackers: triggerMouseFlow", config.experiment.id + config.experiment.variation.id);
-		(window._mfq = window._mfq || []).push(["setVariable", config.experiment.id + config.experiment.variation.id, config.experiment.variation.name]);
+		(window._mfq = window._mfq || []).push(["setVariable", config.experiment.id, config.experiment.variation.name]);
 	};
 
 	const trackElements = function (element) {
