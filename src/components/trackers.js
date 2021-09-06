@@ -7,7 +7,7 @@ const ra_trackers = function (logger, config, environment) {
 	const sendDimension = function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
-			event: `genericEvent`,
+			event: `trackEvent`,
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
 			eventAction,
 			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
@@ -21,6 +21,11 @@ const ra_trackers = function (logger, config, environment) {
 			(window.hj.q = window.hj.q || []).push(arguments);
 		};
 		window.hj("trigger", config.experiment.id + config.experiment.variation.id);
+	};
+
+	const triggerMouseFlow = function () {
+		logger.info("trackers: triggerMouseFlow", config.experiment.id + config.experiment.variation.id);
+		(window._mfq = window._mfq || []).push(["setVariable", config.experiment.id + config.experiment.variation.id, config.experiment.variation.name]);
 	};
 
 	const trackElements = function (element) {
@@ -123,6 +128,7 @@ const ra_trackers = function (logger, config, environment) {
 	return {
 		sendDimension: sendDimension,
 		triggerHotjar: triggerHotjar,
+		triggerMouseFlow: triggerMouseFlow,
 		track: function () {
 
 			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
@@ -132,11 +138,11 @@ const ra_trackers = function (logger, config, environment) {
 				//
 				if (config.devices.mobile && environment.touchSupport) setSwipeEvents();
 				//
-				//if (config.pageLoad) sendDimension("pageLoad event");
-				//else logger.warn("trackers: track: pageLoad tracking disabled");
-				//
 				if (config.hotjar) triggerHotjar();
 				else logger.warn("trackers: track: hotjar tracking disabled");
+				//
+				if (config.mouseFlow) triggerMouseFlow();
+				else logger.warn("trackers: track: mouseFlow tracking disabled");
 				//
 				if (config.eventTracker.active && config.eventTracker.elements.length) {
 					const errors = [];
