@@ -12,9 +12,7 @@ const ra_observers = function (logger) {
 					children = parent.querySelectorAll(parameters.child);
 
 				const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && Array.from(children).includes(node));
-				//const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && node.localName.toLowerCase() === parameters.child.match(/^([a-z]*)[^\.\#[]/)[0].toLowerCase());// we are only interested in nodes with the same tag name.
 				const getNode = (haystack, needle) => Array.from(haystack).includes(needle);// does the children collection contain the mutation target?
-
 				const handleChildList = mutation => {
 					if (mutation.addedNodes.length) {
 						nodeList = getNodeList(mutation.addedNodes);

@@ -4,14 +4,14 @@ const ra_trackers = function (logger, config, environment) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
-	const sendDimension = window.ra_sendDimension || function (eventAction, eventNonInteraction = true) {
+	const sendDimension = function (eventAction, eventNonInteraction = true) {
 		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
 		(window.dataLayer = window.dataLayer || []).push({
-			event: eventNonInteraction ? `trackEventNI` : `trackEvent`,
+			event: `genericEvent`,
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
-			eventAction: eventAction,
+			eventAction,
 			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
-			eventNonInteraction: eventNonInteraction // if not sent default to true
+			eventNonInteraction // if not sent default to true
 		});
 	};
 

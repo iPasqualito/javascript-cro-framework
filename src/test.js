@@ -2,16 +2,6 @@
 
 ((w, d) => {
 
-	window.ra_sendDimension = function (eventAction, eventNonInteraction = true) {
-		(window.dataLayer = window.dataLayer || []).push({
-			event: 'genericEvent',
-			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
-			eventAction: eventAction,
-			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
-			eventNonInteraction: eventNonInteraction // if not sent default to true
-		});
-	};
-
 	const config = {
 		experiment: {
 			id: "ra-frw",
@@ -75,7 +65,10 @@
 				attributes: {
 					class: "ra-frmwrk-overlay",
 					style: "background-color:green;",
-					innerHTML: `<p>This is a test to see if we can remove an attribute</p>`
+					innerHTML: `<p>This is a test to see if we can remove an attribute</p>`,
+					onclick: () => {
+						framework.sendDimension("Details click")
+					}
 				},
 				position: "afterend",
 				target: element
