@@ -14,32 +14,26 @@
 		development: true,
 		debug: true,
 		devices: {
-			mobile: false,
+			mobile: true,
 			desktop: true
 		},
 		hotjar: false,
+		mouseFlow: false,
 		pageLoad: {
-			track: true,
+			track: false,
 			// pass the condition we want to test as a string
 			condition: 'document.body.classList.contains("awesome")'
 		},
 		eventTracker: {
-			active: true,
+			active: false,
 			elements: [{
 				selector: "body",
-				tag: "body click"
+				tag: "body swipe left",
+				events: ["swiped-left"]
 			}, {
-				selector: ".container h1",
-				tag: "hover title",
-				events: ["mouseover"],
-				throttle: 1000
-			}, {
-				selector: ".container p.elliot",
-				tag: "click on paragraph"
-			}, {
-				selector: "blorp",
-				tag: "blorp on blorp",
-				events: ["blorp"]
+				selector: "body",
+				tag: "body swipe right",
+				events: ["swiped-right"]
 			}]
 		},
 		intersectionObserver: {
@@ -78,26 +72,27 @@
 				"data-test": null,
 			})
 
-			framework.observers.observeMutations({
-				parent: d.body,         // Set to true to extend monitoring to the entire subtree of nodes rooted at target.
-				child: "div.banner",    // The element we want to observe mutations on.
-				attributeName: "class",
-				config: {
-					childList: false,   // Set to true to monitor the target node
-				                        // and, if subtree is true, its descendants) for the addition of new child nodes or removal of existing child nodes. The default value is false.
-					subtree: true,      // Set to true to extend monitoring to the entire
-				                        // subtree of nodes rooted at target.
-					attributes: true,   // set to true to listen to attribute changes
-					attributeFilter: ["class"], // An array of specific attribute names to be monitored.
-					attributeOldValue: true,
-					characterData: false,   // Set to true to monitor the specified target node (and, if subtree is true,
-				                            // its descendants) for changes to the character data
-					characterDataOldValue: false    // Set to true to record the previous value of a node's text
-				                                    // whenever the text changes on nodes being monitored.
-				},
-				// function to run when mutation is observed.
-				callback: element => console.log("change picked up!", element)
+			framework.utils.setElementProperties(container, {
+				"data-swipe-threshold": 100,
+				"data-swipe-timeout": 500,
+				"data-swipe-ignore": "false"
 			});
+
+			document.body.addEventListener("swiped-left", event => {
+				framework.logger.log("SWIPE LEFT", event);
+			})
+
+			document.body.addEventListener("swiped-right", event => {
+				framework.logger.log("SWIPE RIGHT", event);
+			})
+
+			document.body.addEventListener("swiped-up", event => {
+				framework.logger.log("SWIPE UP", event);
+			})
+
+			document.body.addEventListener("swiped-down", event => {
+				framework.logger.log("SWIPE DOWN", event);
+			})
 
 		}
 
@@ -116,8 +111,6 @@
 				framework.logger.error("an error occurred", error);
 			}
 		});
-
-		framework.sendDimension(`End of Manual Reached`, false);
 
 	});
 

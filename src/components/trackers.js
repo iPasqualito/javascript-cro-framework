@@ -144,7 +144,7 @@ const ra_trackers = function (logger, config, environment) {
 				if (config.mouseFlow) triggerMouseFlow();
 				else logger.warn("trackers: track: mouseFlow tracking disabled");
 				//
-				if (config.eventTracker.active && config.eventTracker.elements.length) {
+				if (config.eventTracker && config.eventTracker.active && config.eventTracker.elements.length) {
 					const errors = [];
 					config.eventTracker.elements.forEach(e => {
 						errors.concat(trackElements({
@@ -160,7 +160,7 @@ const ra_trackers = function (logger, config, environment) {
 					}
 				} else logger.warn("trackers: track: event tracking disabled");
 				//
-				if (config.intersectionObserver.active && config.intersectionObserver.elements.length) {
+				if (config.intersectionObserver && config.intersectionObserver.active && config.intersectionObserver.elements.length) {
 					config.intersectionObserver.elements.forEach(element => observeIntersections({
 						...element,
 						inCallback: (e) => sendDimension(`intersection observed: ${e.tag}`),
