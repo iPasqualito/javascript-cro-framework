@@ -4,15 +4,28 @@ const ra_trackers = function (logger, config, environment) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
-	const sendDimension = function (eventAction, eventNonInteraction = true) {
-		logger.info("trackers: sendDimension", [eventAction, eventNonInteraction]);
-		(window.dataLayer = window.dataLayer || []).push({
+	const sendDimension = (eventAction, eventNonInteraction = true) => {
+		const data = {
 			event: `trackEvent`,
 			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
 			eventAction,
 			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
 			eventNonInteraction // if not sent default to true
-		});
+		}
+		logger.info("trackers: sendDimension", data);
+		(window.dataLayer = window.dataLayer || []).push(data);
+	};
+
+	const sendCustomDimension = value => {
+		const data = {
+			event: "sendCustomDimension",
+			dimension: value,
+			id: config.experiment.id,
+			variantId: config.experiment.variation.id,
+			variantName: config.experiment.variation.name
+		};
+		logger.info("trackers: sendCustomDimension", data);
+		(window.dataLayer = window.dataLayer || []).push(data);
 	};
 
 	const triggerHotjar = function () {
@@ -29,65 +42,64 @@ const ra_trackers = function (logger, config, environment) {
 	};
 
 	const trackElements = function (element) {
-		// original function written by Michiel Kikkert, @Dutch_Guy
-		const errorStack = [];
+		// original idea by Michiel Kikkert, @Dutch_Guy
+		const errorStack = [],
+			handleError = e => errorStack.push(e);
 		const events = typeof element.events !== "undefined" ? element.events : [];
 
 		const handlerFactory = function (el) {
+
 			let counter = 0,
-				threshold = 0,
-				first = typeof el.first !== "undefined" ? el.first : true,
-				throttle = typeof el.throttle !== "undefined" ? el.throttle : 500;
+				previous = 0,
+				throttle = typeof el.throttle !== "undefined" ? el.throttle : 1000;
+
 			return function (event) {
 
-				let currentTime = performance.now(),
-					found = false,
-					selectors = document.querySelectorAll(el.selector);
+				let current = new Date().getTime();
 
 				const execute = () => {
 					counter++;
-					logger.log(`trackers: handlerFactory: custom event #${counter} tracked`, el.tag + ` [${event.type}]`);
+					logger.log(`trackers: handlerFactory: custom event #${counter} tracked (${el.tag} [${event.type}])`);
 					if (typeof element.callback === "function") element.callback();
+				}, movedAttribute = "data-ra-moved";
+				if (!event.target.matches(el.selector)) return;
+				// prevent triggering a touchend when user swipes element:
+				if (event.type === "touchmove") {
+					event.target.setAttribute(movedAttribute, '');
+					return;
 				}
-
-				selectors.forEach(selector => found = (
-					selector !== null && (
-						event.target.matches(el.selector) || selector.contains(event.target))
-					)
-				);
-
-				if (!found) return;
-				if (threshold === 0) {
-					threshold = currentTime + throttle;
-					if (first) {
-						execute();
-						first = false;
-					}
+				if (event.type === "touchend" && event.target.hasAttribute(movedAttribute)) { // ignore after a move
+					event.target.removeAttribute(movedAttribute);
+					return;
 				}
-				if (threshold > currentTime) return;
-				threshold = 0;
-				execute();
-
+				// logger.log("too soon?", {
+				// 	current: current,
+				// 	previous: previous,
+				// 	difference: current - previous,
+				// 	toSoon: current !== previous && current - previous < throttle
+				// });
+				if (previous === 0) {
+					execute(); // run the first time
+				} else {
+					if (current - previous <= throttle) return;
+					// the difference is bigger, reset previous and fire
+					execute();
+				}
+				previous = current;
 			};
 		};
 		logger.info("trackers: trackElements", element);
 
-		if (!events.length) {
-			if (config.devices.mobile && environment.screenSize === "small" && environment.touchSupport) events.push("touchend"); // smartphone
-			if (config.devices.desktop && environment.screenSize !== "small") {
-				if (environment.touchSupport) events.push("touchend"); // tablet
-				else events.push("mouseup"); // desktop
-			}
-		}
+		if (!events.length) events.push("click");
 
-		if(!events.length) events.push("click");
-
-		events.forEach(e => {
+		events.forEach(type => {
 			try {
-				logger.log(`trackers: trackElements: ${e} eventListener starting for`, element.tag);
-				document.querySelector("body").addEventListener(e, new handlerFactory(element), false)
+				logger.log(`trackers: trackElements: ${type} eventListener starting for`, element.tag);
+				document.querySelector("body").addEventListener(type, new handlerFactory(element), {
+					once: element.once || false
+				});
 			} catch (error) {
-				errorStack.push[error];
+				handleError(error);
 			}
 		});
 
@@ -95,48 +107,147 @@ const ra_trackers = function (logger, config, environment) {
 
 	};
 
-	const setSwipeEvents = function (t = window, e = document) {
+	const setSwipeEvents = function () {
 
 		logger.info("trackers: setSwipeEvents");
 
 		try {
-			"function" != typeof t.CustomEvent && (t.CustomEvent = function (t, n) {
-				n = n || {bubbles: !1, cancelable: !1, detail: void 0};
-				let u = e.createEvent("CustomEvent");
-				return u.initCustomEvent(t, n.bubbles, n.cancelable, n.detail), u
-			}, t.CustomEvent.prototype = t.Event.prototype), e.addEventListener("touchstart", function (t) {
-				if ("true" === t.target.getAttribute("data-swipe-ignore")) return;
-				o = t.target, l = Date.now(), n = t.touches[0].clientX, u = t.touches[0].clientY, a = 0, i = 0
-			}, !1), e.addEventListener("touchmove", function (t) {
-				if (!n || !u) return;
-				let e = t.touches[0].clientX, l = t.touches[0].clientY;
-				a = n - e, i = u - l
-			}, !1), e.addEventListener("touchend", function (t) {
-				if (o !== t.target) return;
-				let e = parseInt(o.getAttribute("data-swipe-threshold") || "20", 10),
-					s = parseInt(o.getAttribute("data-swipe-timeout") || "500", 10), r = Date.now() - l, c = "";
-				Math.abs(a) > Math.abs(i) ? Math.abs(a) > e && r < s && (c = a > 0 ? "swiped-left" : "swiped-right") : Math.abs(i) > e && r < s && (c = i > 0 ? "swiped-up" : "swiped-down");
-				"" !== c && o.dispatchEvent(new CustomEvent(c, {bubbles: !0, cancelable: !0}));
-				n = null, u = null, l = null
-			}, !1);
-			let n = null, u = null, a = null, i = null, l = null, o = null
+
+			document.addEventListener("touchstart", handleTouchStart, false);
+			document.addEventListener("touchmove", handleTouchMove, false);
+			document.addEventListener("touchend", handleTouchEnd, false);
+
+			let xDown = null, yDown = null, xDiff = null, yDiff = null, timeDown = null, startEl = null;
+			/**
+			 * Records current location on touchstart event
+			 * @param {object} e - browser event object
+			 * @returns {void}
+			 */
+			function handleTouchStart(e) {
+
+				// if the element has data-swipe-ignore="true" we stop listening for swipe events
+				if (e.target.getAttribute("data-swipe-ignore") === "true") return;
+
+				startEl = e.target;
+				timeDown = Date.now();
+				xDown = e.touches[0].clientX;
+				yDown = e.touches[0].clientY;
+				xDiff = 0;
+				yDiff = 0;
+			}
+			/**
+			 * Records location diff in px on touchmove event
+			 * @param {object} e - browser event object
+			 * @returns {void}
+			 */
+			function handleTouchMove(e) {
+
+				if (!xDown || !yDown) return;
+
+				const xUp = e.touches[0].clientX;
+				const yUp = e.touches[0].clientY;
+
+				xDiff = xDown - xUp;
+				yDiff = yDown - yUp;
+			}
+			/**
+			 * Fires swiped event if swipe detected on touchend
+			 * @param {object} e - browser event object
+			 * @returns {void}
+			 */
+			function handleTouchEnd(e) {
+
+				// if the user released on a different target, cancel!
+				if (startEl !== e.target) return;
+
+				const swipeThreshold = parseInt(getNearestAttribute(startEl, "data-swipe-threshold", "20"), 10); // default 20px
+				const swipeTimeout = parseInt(getNearestAttribute(startEl, "data-swipe-timeout", "500"), 10);    // default 500ms
+				const timeDiff = Date.now() - timeDown;
+				let eventType = "";
+				const changedTouches = e.changedTouches || e.touches || [];
+
+				if (Math.abs(xDiff) > Math.abs(yDiff)) { // most significant
+					if (Math.abs(xDiff) > swipeThreshold && timeDiff < swipeTimeout) {
+						if (xDiff > 0) {
+							eventType = "swiped-left";
+						} else {
+							eventType = "swiped-right";
+						}
+					}
+				} else if (Math.abs(yDiff) > swipeThreshold && timeDiff < swipeTimeout) {
+					if (yDiff > 0) {
+						eventType = "swiped-up";
+					} else {
+						eventType = "swiped-down";
+					}
+				}
+				if (eventType !== "") {
+					const eventData = {
+						bubbles: true,
+						cancelable: true,
+						detail: {
+							dir: eventType.replace(/swiped-/, ""),
+							touchType: (changedTouches[0] || {}).touchType || "direct",
+							xStart: parseInt(xDown, 10),
+							xEnd: parseInt((changedTouches[0] || {}).clientX || -1, 10),
+							yStart: parseInt(yDown, 10),
+							yEnd: parseInt((changedTouches[0] || {}).clientY || -1, 10)
+						}
+					};
+					// fire `swiped` event on the element that started the swipe
+					startEl.dispatchEvent(new CustomEvent("swiped", eventData));
+					// fire `swiped-dir` event on the element that started the swipe
+					startEl.dispatchEvent(new CustomEvent(eventType, eventData));
+				}
+				// reset values
+				xDown = null;
+				yDown = null;
+				timeDown = null;
+			}
+
+			/**
+			 * Gets attribute off HTML element or nearest parent
+			 * @param {object} el - HTML element to retrieve attribute from
+			 * @param {string} attributeName - name of the attribute
+			 * @param {any} defaultValue - default value to return if no match found
+			 * @returns {any} attribute value or defaultValue
+			 */
+			function getNearestAttribute(el, attributeName, defaultValue) {
+
+				// walk up the dom tree looking for attributeName
+				while (el && el !== document.documentElement) {
+
+					const attributeValue = el.getAttribute(attributeName);
+
+					if (attributeValue) {
+						return attributeValue;
+					}
+
+					el = el.parentNode;
+				}
+
+				return defaultValue;
+			}
 		} catch (error) {
 			logger.error("trackers: setSwipeEvents: error caught", error);
 		}
-	}
+	};
 
 	return {
 		sendDimension: sendDimension,
+		sendCustomDimension: sendCustomDimension,
 		triggerHotjar: triggerHotjar,
 		triggerMouseFlow: triggerMouseFlow,
 		track: function () {
 
-			const windowLoaded = new Promise(resolve => window.addEventListener("load", resolve, false));
+			const windowLoaded = new Promise(resolve => {
+				if (document.readyState === "complete") resolve();
+				else window.addEventListener("load", resolve, false);
+			});
+
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				//
-				if (config.devices.mobile && environment.touchSupport) setSwipeEvents();
 				//
 				if (config.hotjar) triggerHotjar();
 				else logger.warn("trackers: track: hotjar tracking disabled");
@@ -145,20 +256,21 @@ const ra_trackers = function (logger, config, environment) {
 				else logger.warn("trackers: track: mouseFlow tracking disabled");
 				//
 				if (config.eventTracker && config.eventTracker.active && config.eventTracker.elements.length) {
+					if (config.eventTracker.customDimension && typeof config.eventTracker.customDimension === "number") this.sendCustomDimension(config.eventTracker.customDimension);
 					const errors = [];
 					config.eventTracker.elements.forEach(e => {
 						errors.concat(trackElements({
 							...e,
 							callback: () => sendDimension(`${e.tag}`, false)
-						}))
+						}));
 					});
 					if (errors.length) {
-						errors.forEach((error, i) => logger.error(`trackers: trackElements error ${i}`, error));
-						sendDimension("trackElements active, error(s) caught: " + errors.length + " error(s)");
-					} else {
-						sendDimension("trackElements active, no errors");
+						errors.forEach((error, i) => logger.error(`trackers: trackElements error ${i}:`, error));
+						sendDimension(`trackElements active, error(s) caught: ${errors.length} error(s)`);
 					}
 				} else logger.warn("trackers: track: event tracking disabled");
+				//
+				if (environment.touchSupport) setSwipeEvents();
 				//
 				if (config.intersectionObserver && config.intersectionObserver.active && config.intersectionObserver.elements.length) {
 					config.intersectionObserver.elements.forEach(element => observeIntersections({
@@ -169,7 +281,7 @@ const ra_trackers = function (logger, config, environment) {
 				} else logger.warn("trackers: track: intersection observer disabled");
 			});
 		}
-	}
+	};
 };
 
 export default ra_trackers;

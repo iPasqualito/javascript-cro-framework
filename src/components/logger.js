@@ -15,7 +15,7 @@ const ra_logger = function(cfg) {
 		},
 		timeStamp = () => ((performance.now() - kickOff) / 1000).toFixed(3),
 		printRow = function(row) {
-			let css = `font-size:12px;padding:3px 0;font-weight:bold;color:${config.color[row.type]}`;
+			let css = `padding:3px 0;color:${config.color[row.type]}`;
 			if (typeof row.obj === "undefined") {
 				console.log("%c [" + row.timestamp + "s] " + (config.id).toUpperCase() + (typeof row.msg === "object" ? " %o" : (typeof row.msg === "number" ? " %f" : " %s")), css, row.msg);
 			} else {

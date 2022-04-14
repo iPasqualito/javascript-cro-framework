@@ -1,39 +1,32 @@
-/* jshint esversion: 6 */
-
 ((w, d) => {
 
 	const config = {
 		experiment: {
-			id: "ra-frw",
-			name: "SiteWide - CRO Framework",
+			id: "ra-frw-001",
+			name: "Framework Development",
 			variation: {
-				id: "x",
+				id: "B",
 				name: "variant 1"
 			},
 		},
 		development: true,
 		debug: true,
-		devices: {
-			mobile: true,
-			desktop: true
-		},
 		hotjar: false,
 		mouseFlow: false,
 		pageLoad: {
-			track: false,
-			// pass the condition we want to test as a string
-			condition: 'document.body.classList.contains("awesome")'
+			track: true,
+			condition: "document.body.classList.contains(\"awesome\")"
 		},
 		eventTracker: {
-			active: false,
+			active: true,
+			customDimension: 9,
 			elements: [{
-				selector: "body",
-				tag: "body swipe left",
-				events: ["swiped-left"]
+				selector: ".container button",
+				tag: "container button"
 			}, {
-				selector: "body",
-				tag: "body swipe right",
-				events: ["swiped-right"]
+				selector: ".slider .slide",
+				tag: "slider slide",
+				events: ["swiped"]
 			}]
 		},
 		intersectionObserver: {
@@ -52,7 +45,7 @@
 
 		const changeDom = element => {
 
-			console.log("element loaded", element)
+			framework.logger.error("element loaded", element);
 
 			framework.utils.addNodes([{
 				tagName: "details",
@@ -61,40 +54,21 @@
 					style: "background-color:green;",
 					innerHTML: `<p>This is a test to see if we can remove an attribute</p>`,
 					onclick: () => {
-						framework.sendDimension("Details click")
+						framework.sendDimension("Details click");
+					},
+					onmouseover: () => {
+						console.log("hover :)");
 					}
 				},
 				position: "afterend",
 				target: element
-			}])
+			}]);
 
 			framework.utils.setElementProperties(d.querySelector("h1"), {
 				"data-test": null,
-			})
-
-			framework.utils.setElementProperties(container, {
-				"data-swipe-threshold": 100,
-				"data-swipe-timeout": 500,
-				"data-swipe-ignore": "false"
 			});
 
-			document.body.addEventListener("swiped-left", event => {
-				framework.logger.log("SWIPE LEFT", event);
-			})
-
-			document.body.addEventListener("swiped-right", event => {
-				framework.logger.log("SWIPE RIGHT", event);
-			})
-
-			document.body.addEventListener("swiped-up", event => {
-				framework.logger.log("SWIPE UP", event);
-			})
-
-			document.body.addEventListener("swiped-down", event => {
-				framework.logger.log("SWIPE DOWN", event);
-			})
-
-		}
+		};
 
 		framework.utils.awaitNode({
 			selector: "p#elliot",       // the element we're looking for
@@ -111,6 +85,7 @@
 				framework.logger.error("an error occurred", error);
 			}
 		});
+
 
 	});
 

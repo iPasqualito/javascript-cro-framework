@@ -3,7 +3,6 @@ const ra_observers = function (logger) {
 	return {
 		observeMutations: function (parameters) {
 
-			logger.info(`observers: observeMutations`, parameters);
 			let found = false;
 
 			const handleMutation = function (mutation) {
@@ -13,40 +12,29 @@ const ra_observers = function (logger) {
 
 				const getNodeList = nodes => Array.from(nodes).filter(node => node.nodeType !== 3 && node.nodeType !== 8 && Array.from(children).includes(node));
 				const getNode = (haystack, needle) => Array.from(haystack).includes(needle);// does the children collection contain the mutation target?
+				const handleCallback = element => {
+					found = true;
+					parameters.callback(element);
+				}
 				const handleChildList = mutation => {
 					if (mutation.addedNodes.length) {
 						nodeList = getNodeList(mutation.addedNodes);
 						for (let node of nodeList) {
-							found = true;
-							logger.log(`observers: observeMutations: added element:`, node);
 							node.classList.add(parameters.foundClass);
-							parameters.callback(node);
+							handleCallback(node);
 						}
 					} else if (mutation.removedNodes.length) {
 						nodeList = getNodeList(mutation.removedNodes);
-						for (let node of nodeList) {
-							found = true;
-							logger.log(`observers: observeMutations: removed element:`, node);
-							parameters.callback(node);
-						}
+						for (let node of nodeList) handleCallback(node);
 					}
 
 				};
 				const handleCharacterData = mutation => {
 					const mtParent = mutation.target.parentElement;
-					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === parameters.child) {
-						found = true;
-						logger.log(`observers: observeMutations: element characterData changed from "${mutation.oldValue}" to "${mtParent.nodeValue}"`, mutation);
-						parameters.callback(mutation.target);
-					}
+					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === parameters.child) handleCallback(mutation.target);
 				};
-
 				const handleAttributes = mutation => {
-					if (getNode(children, mutation.target)) {
-						found = true;
-						logger.log(`observers: observeMutations: element ${mutation.attributeName}-attribute changed from "${mutation.oldValue}" to "${mutation.target.getAttribute(parameters.attributeName)}"`);
-						parameters.callback(mutation.target);
-					}
+					if (getNode(children, mutation.target)) handleCallback(mutation.target);
 				};
 
 				switch (mutation.type) {
@@ -59,8 +47,8 @@ const ra_observers = function (logger) {
 					case "attributes":
 						handleAttributes(mutation);
 						break;
-					default:
-						logger.log(`observers: observeMutations: I have never heard of that fruit...`);
+					//default:
+					//	logger.log(`observers: observeMutations: I have never heard of that fruit...`);
 				}
 			};
 
@@ -82,8 +70,6 @@ const ra_observers = function (logger) {
 		},
 		observeIntersections: function (element) {
 
-			logger.info("observers: observeIntersections", element);
-
 			document.querySelectorAll(element.selector).forEach(function (e) {
 
 				logger.log("observers: observeIntersections: observer starting for", e);
@@ -102,7 +88,7 @@ const ra_observers = function (logger) {
 						}
 						if (ran && (typeof element.once !== "undefined" ? element.once : true)) {
 							logger.log("observers: observeIntersections: disconnecting");
-							observer.unobserve(e);
+						observer.unobserve(e);
 						}
 					});
 				}, {
