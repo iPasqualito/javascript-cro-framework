@@ -21,7 +21,7 @@ const ra_utils = (logger) => {
 				logger.warn("utils: addStyle: StyleSheet already exists in DOM");
 			} else {
 				const [link] = addNodes([{
-					tagName: 'style',
+					tagName: "style",
 					attributes: {
 						id: id,
 						rel: "stylesheet",
@@ -46,9 +46,9 @@ const ra_utils = (logger) => {
 				element.removeAttribute(key);
 			} else {
 				if (/^(inner|on)\w+$/i.test(key)) {
-					element[key] = attributes[key]
+					element[key] = attributes[key];
 				} else {
-					element.setAttribute(key, value)
+					element.setAttribute(key, value);
 				}
 			}
 		});
@@ -61,20 +61,19 @@ const ra_utils = (logger) => {
 			try {
 				const found = typeof parameters.foundClass !== "undefined" ? parameters.foundClass : "ra-fwk-found",
 					selector = `${parameters.selector}:not(.${found})`,
-					el = document.querySelector(selector),
+					elements = document.querySelectorAll(selector),
 					handleFind = (element, mo) => {
 						element.classList.add(found);
 						mo && parameters.disconnect && mo.disconnect();
 						callback(element);
 					};
-
-				if(el) {
-					handleFind(el, null)
+				if (elements.length > 0) {
+					elements.forEach(el => handleFind(el, null));
 				} else {
 					new MutationObserver(function () {
-						const elementFound = document.querySelector(selector)
+						const elementFound = document.querySelector(selector);
 						if (elementFound) {
-							handleFind(elementFound, this)
+							handleFind(elementFound, this);
 						}
 					}).observe(typeof parameters.parent !== "undefined" ? parameters.parent : document, {
 						subtree: true,
@@ -102,7 +101,7 @@ const ra_utils = (logger) => {
 			return url.toString();
 		},
 		getScreenSize: (screenWidth = window.innerWidth) => (screenWidth < 480 ? "small" : (screenWidth >= 480 && screenWidth <= 1024) ? "medium" : "large"),
-		isTouchEnabled: () => ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0),
+		isTouchEnabled: () => ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0),
 		isMobile: () => {
 			const uaDataIsMobile = typeof window.navigator.userAgentData === "undefined" ? "undefined" : window.navigator.userAgentData.mobile;
 			const legacyIsMobileCheck = (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
@@ -111,7 +110,7 @@ const ra_utils = (logger) => {
 			return typeof uaDataIsMobile === "boolean" ? uaDataIsMobile : legacyIsMobileCheck;
 		},
 		setElementProperties: setElementProperties
-	}
+	};
 
 };
 

@@ -14,7 +14,7 @@ window.ra_framework = function (config) {
 	const utils = new ra_utils(logger);
 
 	const environment = {
-		version: "4.5",
+		version: "4.5.1",
 		touchSupport: utils.isTouchEnabled(),
 		screenSize: utils.getScreenSize(),
 		mobile: utils.isMobile()

@@ -44,6 +44,7 @@ const ra_trackers = function (logger, config, environment) {
 	const trackElements = function (element) {
 		// original idea by Michiel Kikkert, @Dutch_Guy
 		const errorStack = [],
+			logStack = [],
 			handleError = e => errorStack.push(e);
 		const events = typeof element.events !== "undefined" ? element.events : [];
 
@@ -88,21 +89,25 @@ const ra_trackers = function (logger, config, environment) {
 				previous = current;
 			};
 		};
-		logger.info("trackers: trackElements", element);
 
-		if (!events.length) events.push("click");
+		if (events.length === 0) events.push("click");
+		if (events.includes("touchend") && !events.includes("touchmove")) events.push("touchmove");
 
 		events.forEach(type => {
 			try {
-				logger.log(`trackers: trackElements: ${type} eventListener starting for`, element.tag);
+				logStack.push({
+					type: type,
+					tag: element.tag
+				});
 				document.querySelector("body").addEventListener(type, new handlerFactory(element), {
-					once: element.once || false
+					once: type === "touchmove" ? true : element.once || false
 				});
 			} catch (error) {
 				handleError(error);
 			}
 		});
 
+		logger.log("trackers: logStack:", logStack);
 		return errorStack;
 
 	};

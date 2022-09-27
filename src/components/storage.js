@@ -3,6 +3,9 @@ const ra_storage = function(logger) {
 	return {
 		cookie: {
 			read: function (key) {
+
+				// todo: handle strings as well!!
+
 				logger.info("storage: cookie.read", key);
 				let result = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
 				result && (result = JSON.parse(result.pop()));

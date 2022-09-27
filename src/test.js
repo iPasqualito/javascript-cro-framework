@@ -22,7 +22,8 @@
 			customDimension: 9,
 			elements: [{
 				selector: ".container button",
-				tag: "container button"
+				tag: "container button",
+				events: ["touchmove", "touchend"]
 			}, {
 				selector: ".slider .slide",
 				tag: "slider slide",
@@ -47,22 +48,7 @@
 
 			framework.logger.error("element loaded", element);
 
-			framework.utils.addNodes([{
-				tagName: "details",
-				attributes: {
-					class: "ra-frmwrk-overlay",
-					style: "background-color:green;",
-					innerHTML: `<p>This is a test to see if we can remove an attribute</p>`,
-					onclick: () => {
-						framework.sendDimension("Details click");
-					},
-					onmouseover: () => {
-						console.log("hover :)");
-					}
-				},
-				position: "afterend",
-				target: element
-			}]);
+			element.style.border = "2px solid green";
 
 			framework.utils.setElementProperties(d.querySelector("h1"), {
 				"data-test": null,
@@ -71,11 +57,11 @@
 		};
 
 		framework.utils.awaitNode({
-			selector: "p#elliot",       // the element we're looking for
-			tag: "elliot paragraph",    // tag it for identification
+			selector: "div.slide",       // the element we're looking for
+			tag: "slide",    // tag it for identification
 			foundClass: "found",        // add a class when it's found
 			recursive: true,            // search the whole tree or just the parent, true by default
-			disconnect: true            // stop looking when element is found
+			disconnect: true           // stop looking when element is found
 		}, element => {         // function to run after element is found
 			try {
 				changeDom(element);
