@@ -15,7 +15,8 @@
 		mouseFlow: false,
 		pageLoad: {
 			track: true,
-			condition: "document.body.classList.contains(\"awesome\")"
+			condition: "document.body.classList.contains(\"awesome\")",
+			tag: "Custom Pageload Event" // optional
 		},
 		eventTracker: {
 			active: true,
@@ -48,12 +49,19 @@
 
 			framework.logger.error("element loaded", element);
 
-			element.style.border = "2px solid green";
+			element.style.border = "2px solid white";
 
 			framework.utils.setElementProperties(d.querySelector("h1"), {
 				"data-test": null,
 			});
 
+			framework.storage.cookie.write("ra-framework-test", { data: {
+					url: d.location.href,
+				},
+				expires: 21
+			});
+			framework.storage.cookie.read("ra-framework-test");
+			framework.storage.cookie.read("ra-framework-string");
 		};
 
 		framework.utils.awaitNode({
@@ -65,7 +73,6 @@
 		}, element => {         // function to run after element is found
 			try {
 				changeDom(element);
-				framework.sendDimension(`experiment ${config.experiment.id}${config.experiment.variation.id} loaded`);
 				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
 			} catch (error) {
 				framework.logger.error("an error occurred", error);

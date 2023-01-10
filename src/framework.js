@@ -27,7 +27,7 @@ window.ra_framework = function (config) {
 			try {
 				logger.info("framework: init: start", {config, environment});
 				trackers.track();
-				if (config.pageLoad.track && Function(config.pageLoad.condition)) trackers.sendDimension("pageLoad event");
+				if (config.pageLoad.track && Function(config.pageLoad.condition)) trackers.sendDimension(config.pageLoad.tag || "pageLoad event");
 				if (typeof callback === "function") callback.call();
 			} catch (error) {
 				logger.error("framework: init: error caught", error);

@@ -3,16 +3,19 @@ const ra_storage = function(logger) {
 	return {
 		cookie: {
 			read: function (key) {
-
-				// todo: handle strings as well!!
-
 				logger.info("storage: cookie.read", key);
-				let result = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
-				result && (result = JSON.parse(result.pop()));
-				return result;
+				const resultArray = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
+				if(resultArray) {
+					const result = resultArray.pop();
+					try {
+						return JSON.parse(result);
+					} catch (error) {
+						return result;
+					}
+				}
 			},
 			write: function (key, options) {
-				logger.info("storage: cookie.write", [key, options]);
+				logger.info("storage: cookie.write", {key, options});
 				let date = new Date;
 				date.setDate(date.getDate() + (void 0 !== options.expires ? options.expires : 1));
 				document.cookie = "" + key + "=" + ("object" === typeof options.data ? JSON.stringify(options.data) : options.data) + ";" +

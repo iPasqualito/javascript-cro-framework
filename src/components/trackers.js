@@ -44,7 +44,6 @@ const ra_trackers = function (logger, config, environment) {
 	const trackElements = function (element) {
 		// original idea by Michiel Kikkert, @Dutch_Guy
 		const errorStack = [],
-			logStack = [],
 			handleError = e => errorStack.push(e);
 		const events = typeof element.events !== "undefined" ? element.events : [];
 
@@ -95,10 +94,6 @@ const ra_trackers = function (logger, config, environment) {
 
 		events.forEach(type => {
 			try {
-				logStack.push({
-					type: type,
-					tag: element.tag
-				});
 				document.querySelector("body").addEventListener(type, new handlerFactory(element), {
 					once: type === "touchmove" ? true : element.once || false
 				});
@@ -107,7 +102,6 @@ const ra_trackers = function (logger, config, environment) {
 			}
 		});
 
-		logger.log("trackers: logStack:", logStack);
 		return errorStack;
 
 	};
