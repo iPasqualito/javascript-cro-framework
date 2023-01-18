@@ -11,8 +11,6 @@
 		},
 		development: true,
 		debug: true,
-		hotjar: false,
-		mouseFlow: false,
 		pageLoad: {
 			track: true,
 			condition: "document.body.classList.contains(\"awesome\")",
@@ -47,7 +45,13 @@
 
 		const changeDom = element => {
 
-			framework.logger.error("element loaded", element);
+			framework.utils.addStyle(`
+				button *, a * {
+					pointer-events: none;
+				}
+			`, `${config.experiment.id}-css`);
+
+			framework.logger.log("element loaded", element);
 
 			element.style.border = "2px solid white";
 
@@ -74,11 +78,27 @@
 			try {
 				changeDom(element);
 				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
+
+				framework.observers.observeMutations({
+					parent: d.body,
+					child: "div.banner",
+					disconnect: false,
+					config: {
+						childList: true, subtree: true, attributes: true, characterData: true, attributeName: "class"
+					},
+					callback(element) {framework.logger.log("OM:", element)}
+				})
+
+
 			} catch (error) {
 				framework.logger.error("an error occurred", error);
 			}
 		});
 
+		framework.logger.log("element loaded");
+		framework.logger.info("element loaded");
+		framework.logger.warn("element loaded");
+		framework.logger.error("element loaded");
 
 	});
 

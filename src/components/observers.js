@@ -16,25 +16,32 @@ const ra_observers = function (logger) {
 					found = true;
 					parameters.callback(element);
 				}
-				const handleChildList = mutation => {
-					if (mutation.addedNodes.length) {
-						nodeList = getNodeList(mutation.addedNodes);
+				const handleChildList = ({
+					addedNodes,
+					removedNodes
+				}) => {
+					if (addedNodes.length) {
+						nodeList = getNodeList(addedNodes);
 						for (let node of nodeList) {
 							node.classList.add(parameters.foundClass);
 							handleCallback(node);
 						}
-					} else if (mutation.removedNodes.length) {
-						nodeList = getNodeList(mutation.removedNodes);
+					} else if (removedNodes.length) {
+						nodeList = getNodeList(removedNodes);
 						for (let node of nodeList) handleCallback(node);
 					}
 
 				};
-				const handleCharacterData = mutation => {
-					const mtParent = mutation.target.parentElement;
-					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === parameters.child) handleCallback(mutation.target);
+				const handleCharacterData = ({
+					target
+				}) => {
+					const mtParent = target.parentElement;
+					if (getNode(children, mtParent) && mtParent.nodeName.toLowerCase() === parameters.child) handleCallback(target);
 				};
-				const handleAttributes = mutation => {
-					if (getNode(children, mutation.target)) handleCallback(mutation.target);
+				const handleAttributes = ({
+					target
+				}) => {
+					if (getNode(children, target)) handleCallback(target);
 				};
 
 				switch (mutation.type) {
@@ -47,8 +54,6 @@ const ra_observers = function (logger) {
 					case "attributes":
 						handleAttributes(mutation);
 						break;
-					//default:
-					//	logger.log(`observers: observeMutations: I have never heard of that fruit...`);
 				}
 			};
 
@@ -88,7 +93,7 @@ const ra_observers = function (logger) {
 						}
 						if (ran && (typeof element.once !== "undefined" ? element.once : true)) {
 							logger.log("observers: observeIntersections: disconnecting");
-						observer.unobserve(e);
+							observer.unobserve(e);
 						}
 					});
 				}, {

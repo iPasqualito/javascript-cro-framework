@@ -11,21 +11,12 @@ window.ra_framework = function (config) {
 		debug: window.location.hash === "#ra-debug" ? true : config.debug
 	});
 
-	const utils = new ra_utils(logger);
-
-	const environment = {
-		version: "4.5.1",
-		touchSupport: utils.isTouchEnabled(),
-		screenSize: utils.getScreenSize(),
-		mobile: utils.isMobile()
-	};
-
-	const trackers = new ra_trackers(logger, config, environment);
+	const trackers = new ra_trackers(logger, config);
 
 	return {
 		init: callback => {
 			try {
-				logger.info("framework: init: start", {config, environment});
+				logger.info("framework: init: start", {config});
 				trackers.track();
 				if (config.pageLoad.track && Function(config.pageLoad.condition)) trackers.sendDimension(config.pageLoad.tag || "pageLoad event");
 				if (typeof callback === "function") callback.call();
@@ -36,12 +27,10 @@ window.ra_framework = function (config) {
 			}
 		},
 		logger: logger,
-		utils: utils,
-		environment: environment,
+		utils: new ra_utils(logger),
 		storage: new ra_storage(logger),
 		observers: new ra_observers(logger),
 		sendDimension: trackers.sendDimension
 	};
 
 };
-

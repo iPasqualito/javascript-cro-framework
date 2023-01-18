@@ -1,6 +1,6 @@
 import ra_observers from "./observers";
 
-const ra_trackers = function (logger, config, environment) {
+const ra_trackers = function (logger, config) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
 
@@ -27,20 +27,6 @@ const ra_trackers = function (logger, config, environment) {
 		logger.info("trackers: sendCustomDimension", data);
 		(window.dataLayer = window.dataLayer || []).push(data);
 	};
-
-	const triggerHotjar = function () {
-		logger.info("trackers: triggerHotjar", config.experiment.id + config.experiment.variation.id);
-		window.hj = window.hj || function () {
-			(window.hj.q = window.hj.q || []).push(arguments);
-		};
-		window.hj("trigger", config.experiment.id + config.experiment.variation.id);
-	};
-
-	const triggerMouseFlow = function () {
-		logger.info("trackers: triggerMouseFlow", config.experiment.id + config.experiment.variation.id);
-		(window._mfq = window._mfq || []).push(["setVariable", config.experiment.id, config.experiment.variation.name]);
-	};
-
 	const trackElements = function (element) {
 		// original idea by Michiel Kikkert, @Dutch_Guy
 		const errorStack = [],
@@ -72,15 +58,9 @@ const ra_trackers = function (logger, config, environment) {
 					event.target.removeAttribute(movedAttribute);
 					return;
 				}
-				// logger.log("too soon?", {
-				// 	current: current,
-				// 	previous: previous,
-				// 	difference: current - previous,
-				// 	toSoon: current !== previous && current - previous < throttle
-				// });
-				if (previous === 0) {
-					execute(); // run the first time
-				} else {
+
+				if (previous === 0) execute(); // run the first time
+				else {
 					if (current - previous <= throttle) return;
 					// the difference is bigger, reset previous and fire
 					execute();
@@ -94,7 +74,7 @@ const ra_trackers = function (logger, config, environment) {
 
 		events.forEach(type => {
 			try {
-				document.querySelector("body").addEventListener(type, new handlerFactory(element), {
+				document.body.addEventListener(type, new handlerFactory(element), {
 					once: type === "touchmove" ? true : element.once || false
 				});
 			} catch (error) {
@@ -117,11 +97,7 @@ const ra_trackers = function (logger, config, environment) {
 			document.addEventListener("touchend", handleTouchEnd, false);
 
 			let xDown = null, yDown = null, xDiff = null, yDiff = null, timeDown = null, startEl = null;
-			/**
-			 * Records current location on touchstart event
-			 * @param {object} e - browser event object
-			 * @returns {void}
-			 */
+
 			function handleTouchStart(e) {
 
 				// if the element has data-swipe-ignore="true" we stop listening for swipe events
@@ -134,26 +110,17 @@ const ra_trackers = function (logger, config, environment) {
 				xDiff = 0;
 				yDiff = 0;
 			}
-			/**
-			 * Records location diff in px on touchmove event
-			 * @param {object} e - browser event object
-			 * @returns {void}
-			 */
+
 			function handleTouchMove(e) {
 
 				if (!xDown || !yDown) return;
 
-				const xUp = e.touches[0].clientX;
-				const yUp = e.touches[0].clientY;
+				const xUp = e.touches[0].clientX, yUp = e.touches[0].clientY;
 
 				xDiff = xDown - xUp;
 				yDiff = yDown - yUp;
 			}
-			/**
-			 * Fires swiped event if swipe detected on touchend
-			 * @param {object} e - browser event object
-			 * @returns {void}
-			 */
+
 			function handleTouchEnd(e) {
 
 				// if the user released on a different target, cancel!
@@ -204,13 +171,6 @@ const ra_trackers = function (logger, config, environment) {
 				timeDown = null;
 			}
 
-			/**
-			 * Gets attribute off HTML element or nearest parent
-			 * @param {object} el - HTML element to retrieve attribute from
-			 * @param {string} attributeName - name of the attribute
-			 * @param {any} defaultValue - default value to return if no match found
-			 * @returns {any} attribute value or defaultValue
-			 */
 			function getNearestAttribute(el, attributeName, defaultValue) {
 
 				// walk up the dom tree looking for attributeName
@@ -218,10 +178,7 @@ const ra_trackers = function (logger, config, environment) {
 
 					const attributeValue = el.getAttribute(attributeName);
 
-					if (attributeValue) {
-						return attributeValue;
-					}
-
+					if (attributeValue) return attributeValue;
 					el = el.parentNode;
 				}
 
@@ -235,8 +192,6 @@ const ra_trackers = function (logger, config, environment) {
 	return {
 		sendDimension: sendDimension,
 		sendCustomDimension: sendCustomDimension,
-		triggerHotjar: triggerHotjar,
-		triggerMouseFlow: triggerMouseFlow,
 		track: function () {
 
 			const windowLoaded = new Promise(resolve => {
@@ -247,13 +202,7 @@ const ra_trackers = function (logger, config, environment) {
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				//
-				if (config.hotjar) triggerHotjar();
-				else logger.warn("trackers: track: hotjar tracking disabled");
-				//
-				if (config.mouseFlow) triggerMouseFlow();
-				else logger.warn("trackers: track: mouseFlow tracking disabled");
-				//
+
 				if (config.eventTracker && config.eventTracker.active && config.eventTracker.elements.length) {
 					if (config.eventTracker.customDimension && typeof config.eventTracker.customDimension === "number") this.sendCustomDimension(config.eventTracker.customDimension);
 					const errors = [];
@@ -269,7 +218,7 @@ const ra_trackers = function (logger, config, environment) {
 					}
 				} else logger.warn("trackers: track: event tracking disabled");
 				//
-				if (environment.touchSupport) setSwipeEvents();
+				if ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) setSwipeEvents();
 				//
 				if (config.intersectionObserver && config.intersectionObserver.active && config.intersectionObserver.elements.length) {
 					config.intersectionObserver.elements.forEach(element => observeIntersections({
