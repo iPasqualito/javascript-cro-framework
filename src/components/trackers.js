@@ -3,13 +3,51 @@ import ra_observers from "./observers";
 const ra_trackers = function (logger, config) {
 
 	const observeIntersections = new ra_observers(logger).observeIntersections;
+	
+	const {
+		experiment: {
+			id: experimentId,
+			name: experimentName,
+			variation: {
+				id: variationId,
+				name: variationName
+			}
+		},
+		eventTracker: et,
+		intersectionObserver: io,
+		thirdParty: {
+			hotjar: runHotjar,
+			mouseFlow: runMouseFlow,
+			clarity: {
+				run: runClarity,
+				timeout: clarityTimeout = 5000
+			}
+		}
+	} = config;
+	
+	const objectLoaded = function (obj, timeout = 10000) {
+		return new Promise((resolve, reject) => {
+			const now = performance.now(),
+				testObject = async (o, t) => {
+					while (!window.hasOwnProperty(o)) {
+						if( performance.now() - now > t) throw new Error("timeout reached");
+						await new Promise(r => setTimeout(r, 100)); //100 should be a small enough gap
+					}
+					return window[o];
+				};
+			
+			testObject(obj, timeout).then(resolve).catch(error => {
+				reject(`objectLoaded: ${error}`);
+			});
+		});
+	};
 
 	const sendDimension = (eventAction, eventNonInteraction = true) => {
 		const data = {
 			event: `trackEvent`,
-			eventCategory: `${config.experiment.id}: ${config.experiment.name}`,
+			eventCategory: `${experimentId}: ${experimentName}`,
 			eventAction,
-			eventLabel: `${config.experiment.variation.id}: ${config.experiment.variation.name}`,
+			eventLabel: `${variationId}: ${variationName}`,
 			eventNonInteraction // if not sent default to true
 		}
 		logger.info("trackers: sendDimension", data);
@@ -20,13 +58,55 @@ const ra_trackers = function (logger, config) {
 		const data = {
 			event: "sendCustomDimension",
 			dimension: value,
-			id: config.experiment.id,
-			variantId: config.experiment.variation.id,
-			variantName: config.experiment.variation.name
+			id: experimentId,
+			variantId: variationId,
+			variantName: variationName
 		};
 		logger.info("trackers: sendCustomDimension", data);
 		(window.dataLayer = window.dataLayer || []).push(data);
 	};
+	
+	const triggerHotjar = function () {
+		try {
+			logger.info("trackers: triggerHotjar", experimentId + variationId);
+			window.hj = window.hj || function () {
+				(window.hj.q = window.hj.q || []).push(arguments);
+			};
+			window.hj("trigger", experimentId + variationId);
+		}
+		catch (error) {
+			logger.error("trackers: triggerHotjar", error)
+		}
+	};
+	
+	const triggerMouseFlow = function () {
+		try {
+			logger.info("trackers: triggerMouseFlow", experimentId + variationId);
+			(window._mfq = window._mfq || []).push(["setVariable", experimentId + variationId, variationName]);
+		}
+		catch (error) {
+			logger.error("trackers: triggerMouseFlow", error)}
+	};
+	
+	const triggerClarity = function (timeout) {
+		try {
+			objectLoaded("clarity", timeout).then(_clarity => {
+				if (typeof _clarity !== "function") throw new Error("Clarity is not a function");
+				logger.info("trackers: triggerClarity", {
+					experiment: `${experimentId} - ${experimentName}`,
+					variation: `${variationId}: ${variationName}`
+				});
+				_clarity("set", "Experiment", `${experimentId} - ${experimentName}`);
+				_clarity("set", "Variation", `${variationId}: ${variationName}`);
+			}).catch(error => {
+				logger.error("trackers: triggerClarity", error)
+			});
+		}
+		catch (error) {
+			logger.error("trackers: triggerClarity", error)
+		}
+	}
+	
 	const trackElements = function (element) {
 		// original idea by Michiel Kikkert, @Dutch_Guy
 		const errorStack = [],
@@ -74,6 +154,12 @@ const ra_trackers = function (logger, config) {
 
 		events.forEach(type => {
 			try {
+				logger.log(`trackers: trackElements: setting custom eventListener`, {
+					elements: document.querySelectorAll(element.selector),
+					tag: element.tag,
+					type,
+					once: element.once || false
+				});
 				document.body.addEventListener(type, new handlerFactory(element), {
 					once: type === "touchmove" ? true : element.once || false
 				});
@@ -202,11 +288,25 @@ const ra_trackers = function (logger, config) {
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-
-				if (config.eventTracker && config.eventTracker.active && config.eventTracker.elements.length) {
-					if (config.eventTracker.customDimension && typeof config.eventTracker.customDimension === "number") this.sendCustomDimension(config.eventTracker.customDimension);
+				
+				console.log("HOTJAR!", {
+					config: config.thirdParty.hotjar, runHotjar
+				});
+				
+				//
+				if (runHotjar) triggerHotjar();
+				else logger.warn("trackers: track: hotjar tracking disabled");
+				//
+				if (runMouseFlow) triggerMouseFlow();
+				else logger.warn("trackers: track: mouseFlow tracking disabled");
+				//
+				if (runClarity) triggerClarity(clarityTimeout);
+				else logger.warn("trackers: track: Clarity tracking disabled");
+				//
+				if (et && et.active && et.elements.length) {
+					if (et.customDimension && typeof et.customDimension === "number") this.sendCustomDimension(et.customDimension);
 					const errors = [];
-					config.eventTracker.elements.forEach(e => {
+					et.elements.forEach(e => {
 						errors.concat(trackElements({
 							...e,
 							callback: () => sendDimension(`${e.tag}`, false)
@@ -220,8 +320,8 @@ const ra_trackers = function (logger, config) {
 				//
 				if ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) setSwipeEvents();
 				//
-				if (config.intersectionObserver && config.intersectionObserver.active && config.intersectionObserver.elements.length) {
-					config.intersectionObserver.elements.forEach(element => observeIntersections({
+				if (io && io.active && io.elements.length) {
+					io.elements.forEach(element => observeIntersections({
 						...element,
 						inCallback: (e) => sendDimension(`intersection observed: ${e.tag}`),
 						outCallback: null

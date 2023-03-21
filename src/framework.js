@@ -16,7 +16,7 @@ window.ra_framework = function (config) {
 	return {
 		init: callback => {
 			try {
-				logger.info("framework: init: start", {config});
+				logger.info("framework: init: start", config);
 				trackers.track();
 				if (config.pageLoad.track && Function(config.pageLoad.condition)) trackers.sendDimension(config.pageLoad.tag || "pageLoad event");
 				if (typeof callback === "function") callback.call();

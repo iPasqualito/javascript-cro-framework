@@ -51,6 +51,29 @@ const ra_storage = function(logger) {
 				logger.info("storage: localStore.delete", key);
 				localStorage.removeItem(key);
 			}
+		},
+		sessionStore: {
+			read: function (key) {
+				logger.info("storage: localStore.read", key);
+				const value = sessionStorage.getItem(key)
+				try {
+					return JSON.parse(value);
+				} catch (error) {
+					return value;
+				}
+			},
+			write: function (key, data) {
+				logger.info("storage: localStore.write", key, data);
+				if (typeof data === "object") {
+					sessionStorage.setItem(key, JSON.stringify(data));
+				} else {
+					sessionStorage.setItem(key, data);
+				}
+			},
+			delete: function (key) {
+				logger.info("storage: localStore.delete", key);
+				sessionStorage.removeItem(key);
+			}
 		}
 	}
 
