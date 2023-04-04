@@ -59,8 +59,8 @@ const ra_utils = (logger) => {
 	};
 	
 	return {
-		addNodes: addNodes,
-		addStyle: addStyle,
+		addNodes,
+		addStyle,
 		awaitNode: (parameters, callback) => {
 			
 			logger.info("utils: awaitNode", [parameters, callback]);
@@ -141,7 +141,29 @@ const ra_utils = (logger) => {
 			url.search = searchParams.toString();
 			return url.toString();
 		},
-		setElementProperties: setElementProperties
+		throttle: (func, limit = 500) => {
+			let waiting = false;
+			return function () {
+				if (!waiting) {
+					func.apply(this, arguments);
+					waiting = true;
+					setTimeout(function () {
+						waiting = false;
+					}, limit);
+				}
+			};
+		},
+		debounce: (func, delay = 500) => {
+			let timer = null;
+			return function () {
+				const context = this, args = arguments;
+				clearTimeout(timer);
+				timer = setTimeout(() => {
+					func.apply(context, args);
+				}, delay);
+			};
+		},
+		setElementProperties
 	};
 };
 

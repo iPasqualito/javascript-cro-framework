@@ -10,14 +10,6 @@
 		},
 		development: true,
 		debug: true,
-		thirdParty: {
-			hotjar: false,
-			mouseFlow: false,
-			clarity: {
-				run: false,
-				//timeout: 5000
-			}
-		},
 		pageLoad: {
 			track: true,
 			condition: "document.body.classList.contains(\"awesome\")",
@@ -45,6 +37,14 @@
 					tag: "intersection test"
 				}
 			]
+		},
+		thirdParty: {
+			hotjar: false,
+			mouseFlow: false,
+			clarity: {
+				run: true,
+				timeout: 5000
+			}
 		}
 	};
 	
@@ -65,19 +65,31 @@
 			
 			element.style.border = "2px solid white";
 			
-			framework.utils.setElementProperties(d.querySelector("h1"), {
-				"data-test": null
-			});
-			
-			framework.storage.cookie.write("ra-framework-test", {
-				data: {
-					url: d.location.href
-				},
-				expires: 21
-			});
-			framework.storage.cookie.read("ra-framework-test");
-			framework.storage.cookie.read("ra-framework-string");
+			// framework.utils.setElementProperties(d.querySelector("h1"), {
+			// 	"data-test": null
+			// });
+			//
+			// framework.storage.cookie.write("ra-framework-test", {
+			// 	data: {
+			// 		url: d.location.href
+			// 	},
+			// 	expires: 21
+			// });
+			// framework.storage.cookie.read("ra-framework-test");
+			// framework.storage.cookie.read("ra-framework-string");
 		};
+		
+		function onMouseMove(e){
+			//console.clear();
+			framework.logger.log(e.x, e.y);
+		}
+
+		// Define the debounced function
+		const debouncedMouseMove = framework.utils.debounce(onMouseMove, 500);
+
+		// Call the debounced function on every mouse move
+		w.addEventListener('mousemove', debouncedMouseMove);
+		
 		
 		// framework.utils
 	    //      .awaitNodePromise({

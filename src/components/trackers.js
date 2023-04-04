@@ -288,11 +288,6 @@ const ra_trackers = function (logger, config) {
 			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
-				
-				console.log("HOTJAR!", {
-					config: config.thirdParty.hotjar, runHotjar
-				});
-				
 				//
 				if (runHotjar) triggerHotjar();
 				else logger.warn("trackers: track: hotjar tracking disabled");
