@@ -1,28 +1,42 @@
 const ra_storage = function(logger) {
 
+	const parseResult = input => {
+		try {
+			return JSON.parse(input);
+		} catch (error) {
+			return input;
+		}
+	}
+	
 	return {
 		cookie: {
 			read: function (key) {
-				logger.info("storage: cookie.read", key);
-				const resultArray = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
-				if(resultArray) {
-					const result = resultArray.pop();
-					try {
-						return JSON.parse(result);
-					} catch (error) {
-						return result;
-					}
+				const valueArray = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
+				if(valueArray) {
+					const value = valueArray.pop();
+					logger.info("storage: cookie.read", {
+						key,
+						value
+					});
+					if (value) return parseResult(value);
 				}
 			},
-			write: function (key, options) {
-				logger.info("storage: cookie.write", {key, options});
-				let date = new Date;
-				date.setDate(date.getDate() + (void 0 !== options.expires ? options.expires : 1));
-				document.cookie = "" + key + "=" + ("object" === typeof options.data ? JSON.stringify(options.data) : options.data) + ";" +
-					"expires=" + date.toUTCString() + ";" +
-					"path=" + (void 0 !== options.path ? options.path : "/") + ";" +
-					"domain=" + (void 0 !== options.domain ? options.domain : window.location.hostname) + ";" +
-					(void 0 !== options.secure ? options.secure ? "Secure;" : "" : "");
+			write: (key, {
+				data,
+				max_age = 1814400, // default to 21 days
+				path = "/",
+				domain = document.domain,
+				secure = false
+			}) => {
+				logger.info("storage: cookie.write", {
+					key,
+					data,
+					max_age,
+					path,
+					domain,
+					secure
+				});
+				document.cookie = `${key}=${("object" === typeof data ? JSON.stringify(data) : data)};max-age=${max_age};path=${path};domain=${domain};${secure ? "Secure;" : ""}`;
 			},
 			delete: function (key) {
 				logger.info("storage: cookie.delete", key);
@@ -31,13 +45,12 @@ const ra_storage = function(logger) {
 		},
 		localStore: {
 			read: function (key) {
-				logger.info("storage: localStore.read", key);
 				const value = localStorage.getItem(key)
-				try {
-					return JSON.parse(value);
-				} catch (error) {
-					return value;
-				}
+				logger.info("storage: localStore.read", {
+					key,
+					value
+				});
+				if (value) return parseResult(value);
 			},
 			write: function (key, data) {
 				logger.info("storage: localStore.write", key, data);
@@ -50,29 +63,6 @@ const ra_storage = function(logger) {
 			delete: function (key) {
 				logger.info("storage: localStore.delete", key);
 				localStorage.removeItem(key);
-			}
-		},
-		sessionStore: {
-			read: function (key) {
-				logger.info("storage: localStore.read", key);
-				const value = sessionStorage.getItem(key)
-				try {
-					return JSON.parse(value);
-				} catch (error) {
-					return value;
-				}
-			},
-			write: function (key, data) {
-				logger.info("storage: localStore.write", key, data);
-				if (typeof data === "object") {
-					sessionStorage.setItem(key, JSON.stringify(data));
-				} else {
-					sessionStorage.setItem(key, data);
-				}
-			},
-			delete: function (key) {
-				logger.info("storage: localStore.delete", key);
-				sessionStorage.removeItem(key);
 			}
 		}
 	}

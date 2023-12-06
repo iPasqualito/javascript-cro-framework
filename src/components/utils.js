@@ -1,23 +1,20 @@
 const ra_utils = (logger) => {
-	const addNodes = (nodes) =>
-		nodes.map(({
-			tagName,
-			attributes,
-			position = null,
-			target = null
-		}) => {
-			const node = document.createElement(tagName);
-			
-			setElementProperties(node, attributes);
-			
-			if (position && target) {
-				if (position === "replace")
-					target.parentNode.replaceChild(node, target);
-				else target.insertAdjacentElement(position, node);
-			}
-			
-			return node;
-		});
+	const addNodes = (nodes) => nodes.map(({
+		tagName,
+		attributes,
+		position = null,
+		target = null
+	}) => {
+		const node = document.createElement(tagName);
+		
+		setElementProperties(node, attributes);
+		
+		if (position && target) {
+			if (position === "replace") target.parentNode.replaceChild(node, target); else target.insertAdjacentElement(position, node);
+		}
+		
+		return node;
+	});
 	
 	const addStyle = (css, id) => {
 		try {
@@ -25,18 +22,16 @@ const ra_utils = (logger) => {
 				logger.warn("utils: addStyle: StyleSheet already exists in DOM");
 				return;
 			}
-			const [link] = addNodes([
-				{
-					tagName: "style",
-					attributes: {
-						id: id,
-						rel: "stylesheet",
-						type: "text/css"
-					},
-					position: "beforeend",
-					target: document.head
-				}
-			]);
+			const [link] = addNodes([{
+				tagName: "style",
+				attributes: {
+					id: id,
+					rel: "stylesheet",
+					type: "text/css"
+				},
+				position: "beforeend",
+				target: document.head
+			}]);
 			
 			link.append(document.createTextNode(css));
 			
@@ -52,8 +47,7 @@ const ra_utils = (logger) => {
 			if (value === null || typeof value === "undefined") {
 				element.removeAttribute(key);
 			} else {
-				if (/^(inner|on)\w+$/i.test(key)) element[key] = attributes[key];
-				else element.setAttribute(key, value);
+				if (/^(inner|on)\w+$/i.test(key)) element[key] = attributes[key]; else element.setAttribute(key, value);
 			}
 		});
 	};
@@ -61,86 +55,77 @@ const ra_utils = (logger) => {
 	return {
 		addNodes,
 		addStyle,
-		awaitNode: (parameters, callback) => {
+		setElementProperties,
+		
+		awaitNode: ({
+			parent = document,
+			selector,
+			foundClass = "ra-fwk-found",
+			disconnect: quit = true
+		}, callback) => {
 			
-			logger.info("utils: awaitNode", [parameters, callback]);
 			try {
-				const found = typeof parameters.foundClass !== "undefined" ? parameters.foundClass : "ra-fwk-found",
-					selector = `${parameters.selector}:not(.${found})`,
-					el = document.querySelector(selector),
-					handleFind = (element, mo) => {
-						element.classList.add(found);
-						mo && parameters.disconnect && mo.disconnect();
-						callback(element);
-					};
 				
-				if(el) {
-					logger.log("utils: awaitNode: element already exists", parameters.tag);
-					handleFind(el, null)
-				} else {
-					logger.log("utils: awaitNode: kicking off Mutation Observer...", parameters.tag);
-					new MutationObserver(function () {
-						const elementFound = document.querySelector(selector)
-						if (elementFound) {
-							logger.log("utils: awaitNode: element found", parameters.tag);
-							handleFind(elementFound, this)
+				logger.log("utils: awaitNode: start...", {
+					parent,
+					selector,
+					foundClass,
+					quit,
+					callback
+				});
+				
+				const elements = document.querySelectorAll(`${selector}:not(.${foundClass})`),
+					handleFind = (elements, mo) => {
+						elements.forEach(element => {
+							logger.log("utils: awaitNode: element found", {
+								selector: `${selector}:not(.${foundClass})`,
+								element
+							});
+							element.classList.add(foundClass);
+							callback(element);
+						});
+						if (mo && quit) {
+							logger.log("utils: awaitNode: disconnecting...");
+							mo.disconnect();
 						}
-					}).observe(typeof parameters.parent !== "undefined" ? parameters.parent : document, {
+					};
+				if (elements.length > 0) {
+					logger.log("utils: awaitNode: element(s) already in DOM", {
+						elements,
+						selector: `${selector}:not(.${foundClass})`
+					});
+					handleFind(elements, null);
+				}
+				//{
+				logger.log("utils: awaitNode: kicking off Mutation Observer for:", `${selector}:not(.${foundClass})`);
+				if (elements.length === 0 || (elements.length > 0 && quit === false)) {
+					new MutationObserver(function (mutationList, observer) {
+						for (const {
+							type,
+							addedNodes
+						} of mutationList) {
+							if (type !== "childList" || addedNodes.length === 0) return;
+							const elementsFound = document.querySelectorAll(`${selector}:not(.${foundClass})`);
+							if (elementsFound.length > 0) {
+								logger.log("awaitNode mutation", {
+									addedNodes,
+									mutationType: type,
+									elementsFound: elementsFound.length
+								});
+								handleFind(elementsFound, this);
+							}
+						}
+					}).observe(typeof parent !== "undefined" ? parent : document, {
 						subtree: true,
 						childList: true
 					});
 				}
+				//}
 			} catch (error) {
 				logger.error("utils: awaitNode: error", error);
 			}
 		},
-		awaitNodePromise: (parameters) => {
-			return new Promise((resolve, reject) => {
-				const found =
-						typeof parameters.foundClass !== "undefined"
-							? parameters.foundClass
-							: "ra-fwk-found",
-					selector = `${parameters.selector}:not(.${found})`,
-					elements = document.querySelectorAll(selector),
-					handleFind = (elements) => {
-						elements.forEach((element) => element.classList.add(found));
-						resolve(elements);
-					};
-				if (elements.length) handleFind(elements);
-				else {
-					new MutationObserver(function () {
-						const elements = document.querySelectorAll(selector);
-						if (elements.length) {
-							handleFind(elements);
-							if (parameters.disconnect) this.disconnect();
-						}
-					}).observe(
-						typeof parameters.parent !== "undefined"
-							? parameters.parent
-							: document,
-						{
-							subtree: true,
-							childList: true
-						}
-					);
-				}
-			});
-		},
-		editQueryParam: (parameters) => {
-			let url = new URL(document.location.href),
-				searchParams = new URLSearchParams(url.search);
-			for (let key in parameters) {
-				if (parameters.hasOwnProperty(key)) {
-					if (!parameters[key]) {
-						searchParams.delete(key);
-					} else {
-						searchParams.set(key, parameters[key]);
-					}
-				}
-			}
-			url.search = searchParams.toString();
-			return url.toString();
-		},
+
 		throttle: (func, limit = 500) => {
 			let waiting = false;
 			return function () {
@@ -153,17 +138,20 @@ const ra_utils = (logger) => {
 				}
 			};
 		},
+
 		debounce: (func, delay = 500) => {
 			let timer = null;
 			return function () {
-				const context = this, args = arguments;
+				const outer_this = this, outer_arguments = arguments;
 				clearTimeout(timer);
 				timer = setTimeout(() => {
-					func.apply(context, args);
+					func.apply(outer_this, outer_arguments);
 				}, delay);
 			};
 		},
-		setElementProperties
+
+		JSONtoEncodedString: json => encodeURIComponent(JSON.stringify(json)),
+		decodedStringToJSON: string => JSON.parse(decodeURIComponent(string))
 	};
 };
 

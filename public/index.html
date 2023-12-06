@@ -6,11 +6,11 @@
 	<title>recoveryArea Framework Test Page</title>
 	<link href="../src/scss/app.scss" rel="stylesheet"/>
 	<script src="../src/framework.js"></script>
-	<script src="../src/test.js"></script>
+	<script src="../src/variant.js"></script>
 </head>
 <body class="awesome">
 <div class="container">
-	<h1 data-test="remove_me">recoveryArea Framework 4.7.1</h1>
+	<h1 data-test="remove_me">recoveryArea Framework 4.8</h1>
 	<button><span>Click me to add a class to the banner</span></button>
 	<div class="slider">
 		<div class="slides">
@@ -35,20 +35,5 @@
 <div class="banner">
 	<p>This one gets picked up by the intersection observer...</p>
 </div>
-<script>
-
-	(d => {
-		setTimeout(() => {
-			const element = d.createElement("p");
-			element.innerText = "This element was added to the DOM...";
-			element.id ="elliot";
-			element.style.fontSize = "1em";
-			d.querySelector(".container").appendChild(element);
-		}, 1500);
-		d.querySelector(".container button").addEventListener("click", () => d.querySelector("div.banner").classList.toggle("pickupClass"));
-
-	})(document)
-
-</script>
 </body>
 </html>
