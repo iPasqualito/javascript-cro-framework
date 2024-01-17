@@ -58,7 +58,7 @@ const ra_observers = function (logger) {
 					}
 				});
 				if (found && parameters.disconnect) {
-					logger.log(`observers: observeMutations: disconnecting, goodbye.`);
+					logger.info(`observers: observeMutations: disconnecting, goodbye.`);
 					observer.disconnect();
 				}
 			});
@@ -67,22 +67,22 @@ const ra_observers = function (logger) {
 		},
 		observeIntersections: function (element) {
 			document.querySelectorAll(element.selector).forEach(function (e) {
-				logger.log("observers: observeIntersections: observer starting for", e);
+				logger.info("observers: observeIntersections: observer starting for", e);
 				
 				const observer = new IntersectionObserver((entries) => {
 					let ran = false;
 					entries.forEach(({isIntersecting}) => {
 						if (isIntersecting && typeof element.inCallback === "function") {
-							logger.log("observers: observeIntersections: intersecting");
+							logger.info("observers: observeIntersections: intersecting");
 							element.inCallback(element);
 							ran = true;
 						} else if (typeof element.outCallback === "function") {
-							logger.log("observers: observeIntersections: not intersecting");
+							logger.info("observers: observeIntersections: not intersecting");
 							element.outCallback(element);
 							ran = true;
 						}
 						if (ran && (typeof element.once !== "undefined" ? element.once : true)) {
-							logger.log("observers: observeIntersections: disconnecting");
+							logger.info("observers: observeIntersections: disconnecting");
 							observer.unobserve(e);
 						}
 					});

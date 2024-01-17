@@ -21,8 +21,7 @@
 		"build-prod": "npm run clean && parcel build public/index.html --no-source-maps --no-content-hash"
 	},
 	"browserslist": [
-		"last 1 version",
-		"> 0.1%"
+		"last 1 version"
 	],
 	"devDependencies": {
 		"@babel/core": "^7.21.4",

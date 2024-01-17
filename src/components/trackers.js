@@ -29,12 +29,7 @@ const ra_trackers = function (logger, config) {
 			exp_event_act: eventAction
 		};
 		
-		logger.info("trackers: sendDimension", {
-			ga_version,
-			data: {
-				event: `trackEvent`, ...ga_data
-			}
-		});
+		logger.info(`trackers: sendDimension`, { event: `trackEvent`, ...ga_data });
 		
 		(window.dataLayer = window.dataLayer || []).push({
 			event: `trackEvent`, ...ga_data
@@ -58,7 +53,7 @@ const ra_trackers = function (logger, config) {
 				
 				const execute = () => {
 					counter++;
-					logger.log(`trackers: handlerFactory: custom event #${counter} tracked (${el.tag} [${event.type}])`);
+					logger.info(`trackers: handlerFactory: custom event #${counter} tracked (${el.tag} [${event.type}])`);
 					if (typeof element.callback === "function") element.callback();
 				}, movedAttribute = "data-ra-moved";
 				if (!event.target.matches(el.selector)) return;
@@ -88,7 +83,7 @@ const ra_trackers = function (logger, config) {
 		
 		events.forEach(type => {
 			try {
-				logger.log(`trackers: trackElements: setting custom eventListener`, {
+				logger.info(`trackers: trackElements: setting custom eventListener`, {
 					elements: document.querySelectorAll(element.selector),
 					tag: element.tag,
 					type,
@@ -167,7 +162,7 @@ const ra_trackers = function (logger, config) {
 					}
 				} else {
 					console.log("trackers: setSwipeEvents: tap registered");
-					//e.target.dispatchEvent(new Event("click", ));
+					e.target.dispatchEvent(new Event("click", ));
 				}
 			}
 			

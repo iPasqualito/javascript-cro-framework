@@ -66,7 +66,7 @@ const ra_utils = (logger) => {
 			
 			try {
 				
-				logger.log("utils: awaitNode: start...", {
+				logger.info("utils: awaitNode: start...", {
 					parent,
 					selector,
 					foundClass,
@@ -74,10 +74,10 @@ const ra_utils = (logger) => {
 					callback
 				});
 				
-				const elements = document.querySelectorAll(`${selector}:not(.${foundClass})`),
-					handleFind = (elements, mo) => {
+				const elements = document.querySelectorAll(`${selector}:not(.${foundClass})`);
+				const handleFind = (elements, mo) => {
 						elements.forEach(element => {
-							logger.log("utils: awaitNode: element found", {
+							logger.info("utils: awaitNode: element found", {
 								selector: `${selector}:not(.${foundClass})`,
 								element
 							});
@@ -85,19 +85,19 @@ const ra_utils = (logger) => {
 							callback(element);
 						});
 						if (mo && quit) {
-							logger.log("utils: awaitNode: disconnecting...");
+							logger.info("utils: awaitNode: disconnecting...");
 							mo.disconnect();
 						}
 					};
 				if (elements.length > 0) {
-					logger.log("utils: awaitNode: element(s) already in DOM", {
+					logger.info("utils: awaitNode: element(s) already in DOM", {
 						elements,
 						selector: `${selector}:not(.${foundClass})`
 					});
 					handleFind(elements, null);
 				}
 				//{
-				logger.log("utils: awaitNode: kicking off Mutation Observer for:", `${selector}:not(.${foundClass})`);
+				logger.info("utils: awaitNode: kicking off Mutation Observer for:", `${selector}:not(.${foundClass})`);
 				if (elements.length === 0 || (elements.length > 0 && quit === false)) {
 					new MutationObserver(function (mutationList, observer) {
 						for (const {
@@ -107,7 +107,7 @@ const ra_utils = (logger) => {
 							if (type !== "childList" || addedNodes.length === 0) return;
 							const elementsFound = document.querySelectorAll(`${selector}:not(.${foundClass})`);
 							if (elementsFound.length > 0) {
-								logger.log("awaitNode mutation", {
+								logger.info("utils: awaitNode: mutation", {
 									addedNodes,
 									mutationType: type,
 									elementsFound: elementsFound.length
@@ -125,7 +125,22 @@ const ra_utils = (logger) => {
 				logger.error("utils: awaitNode: error", error);
 			}
 		},
-
+		
+		objectLoaded: function (obj, timeout = 10000) {
+			return new Promise((resolve, reject) => {
+				const now = performance.now(), testObject = async (o, t) => {
+					while (!window.hasOwnProperty(o)) {
+						if (performance.now() - now > t) throw new Error("utils: objectLoaded: timeout reached");
+						await new Promise(r => setTimeout(r, 100)); //100 should be a small enough gap
+					}
+					return window[o];
+				};
+				testObject(obj, timeout).then(resolve).catch(error => {
+					reject(`utils: objectLoaded error: ${error}`);
+				});
+			});
+		},
+		
 		throttle: (func, limit = 500) => {
 			let waiting = false;
 			return function () {

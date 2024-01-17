@@ -92,8 +92,6 @@
 				}
 			});
 			
-			framework.third_party_tools.triggerHotjar();
-			
 		};
 		
 		// function onMouseMove(e){
@@ -116,6 +114,7 @@
 		framework.utils.awaitNode({
 			selector: "div.slide",
 			foundClass: "found",
+			disconnect: true
 		}, element => {
 			try {
 				if (d.body.classList.contains("ra-001-frw")) return;
