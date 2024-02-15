@@ -1,5 +1,5 @@
 ((w, d) => {
-	const framework_config = {
+	const config = {
 		experiment: {
 			id: "ra-frw-001",
 			name: "Framework Development",
@@ -37,60 +37,56 @@
 		}
 	};
 	
-	const framework = new ra_framework(framework_config);
+	const framework = new ra_framework(config);
 	
-	framework.init(({
-		experiment: {
-			id
-		}
-	} = framework_config) => {
+	framework.init(() => {
 		const changeDom = (element) => {
 			
 			framework.logger.log("element loaded", element);
 			
-			element.style.border = "2px solid green";
-			
-			framework.utils.addStyle(`
-				button>*, a>* { pointer-events: none; }
-			`, `${id.toLowerCase()}-style`);
-			
-			const showHide = () => {
-				framework.logger.log("(throttled) showHide", {
-					scrollY: w.scrollY
-				});
-				d.body.classList.toggle("ra-094-fixed", w.scrollY > 100);
-			};
-			
-			showHide();
-			
-			const throttledShowHide = framework.utils.throttle(showHide);
-			
-			w.addEventListener("scroll", throttledShowHide);
-			w.addEventListener("resize", throttledShowHide);
-			
-			framework.storage.cookie.write("max-age-test", {
-				data: {
-					awesomeness: true
-				},
-				max_age: 300
-			});
-			
-			framework.observers.observeMutations({
-				parent: d,
-				child: "body",
-				tag: "Body Fixed",
-				foundClass: "ra-001-found",
-				disconnect: false,
-				config: {
-					childList: true,
-					subtree: true,
-					attributes: true,
-					characterData: true
-				},
-				callback: function (body) {
-					framework.logger.log("mutation observed", body);
-				}
-			});
+			// element.style.border = "2px solid green";
+			//
+			// framework.utils.addStyle(`
+			// 	button>*, a>* { pointer-events: none; }
+			// `, `${id.toLowerCase()}-style`);
+			//
+			// const showHide = () => {
+			// 	framework.logger.log("(throttled) showHide", {
+			// 		scrollY: w.scrollY
+			// 	});
+			// 	d.body.classList.toggle("ra-094-fixed", w.scrollY > 100);
+			// };
+			//
+			// showHide();
+			//
+			// const throttledShowHide = framework.utils.throttle(showHide);
+			//
+			// w.addEventListener("scroll", throttledShowHide);
+			// w.addEventListener("resize", throttledShowHide);
+			//
+			// framework.storage.cookie.write("max-age-test", {
+			// 	data: {
+			// 		awesomeness: true
+			// 	},
+			// 	max_age: 300
+			// });
+			//
+			// framework.observers.observeMutations({
+			// 	parent: d,
+			// 	child: "body",
+			// 	tag: "Body Fixed",
+			// 	foundClass: "ra-001-found",
+			// 	disconnect: false,
+			// 	config: {
+			// 		childList: true,
+			// 		subtree: true,
+			// 		attributes: true,
+			// 		characterData: true
+			// 	},
+			// 	callback: function (body) {
+			// 		framework.logger.log("mutation observed", body);
+			// 	}
+			// });
 			
 		};
 		
@@ -110,21 +106,27 @@
 		// 	foundClass: "found",
 		// 	disconnect: false
 		// }).then(framework.logger.log);
+		const trigger_third_party_tools = () => {
+			framework.third_party_tools.triggerHotjar();
+			framework.third_party_tools.triggerMouseFlow();
+			framework.third_party_tools.triggerClarity();
+		}
 		
 		framework.utils.awaitNode({
-			selector: "div.slide",
+			selector: "div.ra-pick-me-up",
 			foundClass: "found",
 			disconnect: true
 		}, element => {
-			try {
-				if (d.body.classList.contains("ra-001-frw")) return;
-				changeDom(element);
-				d.body.classList.add("ra-001-frw");
-				w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
-			} catch (error) {
-				framework.logger.error("an error occurred", error);
-			}
+			if (d.body.classList.contains("ra-001-frw")) return;
+			changeDom(element);
+			trigger_third_party_tools();
+			d.body.classList.add("ra-001-frw");
+			w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
+
 		});
 		
+
+		
 	});
+	
 })(window, document);

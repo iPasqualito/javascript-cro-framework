@@ -10,7 +10,7 @@ const ra_storage = function(logger) {
 	
 	return {
 		cookie: {
-			read: function (key) {
+			read: (key) => {
 				const valueArray = document.cookie.match("(^|[^;]+)\\s*" + key + "\\s*=\\s*([^;]+)");
 				if(valueArray) {
 					const value = valueArray.pop();
@@ -38,29 +38,51 @@ const ra_storage = function(logger) {
 				});
 				document.cookie = `${key}=${("object" === typeof data ? JSON.stringify(data) : data)};max-age=${max_age};path=${path};domain=${domain};${secure ? "Secure;" : ""}`;
 			},
-			delete: function (key) {
+			delete: (key) => {
 				logger.info("storage: cookie.delete", key);
 				document.cookie = [key, "=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=.", window.location.host].join("");
 			}
 		},
-		localStore: {
-			read: function (key) {
-				const value = localStorage.getItem(key)
-				logger.info("storage: localStore.read", {
+		session_storage: { // using this is preferred, try not to clutter local storage!
+			read: (key) => {
+				const value = sessionStorage.getItem(key)
+				logger.info("storage: session_storage.read", {
 					key,
 					value
 				});
 				if (value) return parseResult(value);
 			},
-			write: function (key, data) {
-				logger.info("storage: localStore.write", key, data);
+			write: (key, data) => {
+				logger.info("storage: session_storage.write", key, data);
+				if (typeof data === "object") {
+					sessionStorage.setItem(key, JSON.stringify(data));
+				} else {
+					sessionStorage.setItem(key, data);
+				}
+			},
+			delete: (key) => {
+				logger.info("storage: session_storage.delete", key);
+				sessionStorage.removeItem(key);
+			}
+		},
+		local_storage: {
+			read: (key) => {
+				const value = localStorage.getItem(key)
+				logger.info("storage: local_storage.read", {
+					key,
+					value
+				});
+				if (value) return parseResult(value);
+			},
+			write: (key, data) => {
+				logger.info("storage: local_storage.write", key, data);
 				if (typeof data === "object") {
 					localStorage.setItem(key, JSON.stringify(data));
 				} else {
 					localStorage.setItem(key, data);
 				}
 			},
-			delete: function (key) {
+			delete: (key) => {
 				logger.info("storage: localStore.delete", key);
 				localStorage.removeItem(key);
 			}
