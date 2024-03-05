@@ -6,12 +6,12 @@ import ra_storage from "./components/storage";
 import ra_third_party_tools from "./components/third_party_tools";
 
 window.ra_framework = function (config) {
-	
+
 	const logger = new ra_logger({
 		experiment: config.experiment,
 		debug: window.location.hash === "#ra-debug" ? true : config.debug
 	});
-	
+
 	const trackers = new ra_trackers(logger, config);
 	const google_analytics_version = config.eventTracker.ga_version || 3;
 
@@ -38,5 +38,3 @@ window.ra_framework = function (config) {
 		sendDimension: trackers.sendDimension
 	};
 };
-
-

@@ -29,11 +29,19 @@ ul {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+
+	.ra-frw-new-features {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
 	> .slider {
 		margin: 20px 0;
 		width: 300px;
 		text-align: center;
 		overflow: hidden;
+
 		.slides {
 			display: flex;
 			overflow-x: auto;
@@ -41,17 +49,21 @@ ul {
 			scroll-behavior: smooth;
 			-webkit-overflow-scrolling: touch;
 		}
+
 		.slides::-webkit-scrollbar {
 			width: 10px;
 			height: 10px;
 		}
+
 		.slides::-webkit-scrollbar-thumb {
 			background: black;
 			border-radius: 10px;
 		}
+
 		.slides::-webkit-scrollbar-track {
 			background: transparent;
 		}
+
 		.slides > div.slide {
 			scroll-snap-align: start;
 			flex-shrink: 0;
@@ -71,6 +83,7 @@ ul {
 		}
 	}
 }
+
 .banner {
 	height: 240px;
 	margin: 40px 0;
