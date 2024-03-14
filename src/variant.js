@@ -121,8 +121,7 @@
 			changeDom(element);
 			trigger_third_party_tools();
 			d.body.classList.add("ra-001-frw");
-			w.dispatchEvent(new Event("raExperimentLoaded")); // tell tracker experiment code has run
-
+			w.dispatchEvent(new Event(`raExperimentLoaded`)); // tell tracker experiment code has run
 		});
 		
 

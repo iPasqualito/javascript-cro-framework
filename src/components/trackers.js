@@ -17,7 +17,7 @@ const ra_trackers = function (logger, config) {
 		intersectionObserver: intersection_observer
 	} = config;
 
-	const sendDimension = (eventAction, eventNonInteraction = true, ga_version = 3) => {
+	const sendDimension = (eventAction, eventNonInteraction = true, ga_version = 4) => {
 
 		const ga_data = ga_version === 3 ? {
 			eventCategory: `${experimentId}: ${experimentName}`,
@@ -25,7 +25,7 @@ const ra_trackers = function (logger, config) {
 			eventLabel: `${variationId}: ${variationName}`,
 			eventNonInteraction // if not sent default to true
 		} : {
-			exp_event_cat: `${experimentId}: ${experimentName}`,
+			exp_event_cat: `${experimentId}${variationId}`,
 			exp_event_act: eventAction
 		};
 
@@ -178,7 +178,7 @@ const ra_trackers = function (logger, config) {
 						}
 					}
 				} else {
-					logger.info("trackers: setSwipeEvents: tap registered", e.target);
+					//logger.info("trackers: setSwipeEvents: tap registered", e.target);
 					e.target.dispatchEvent(new Event("click"));
 				}
 			}

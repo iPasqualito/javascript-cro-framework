@@ -1,6 +1,6 @@
 {
 	"name": "javascript-cro-framework",
-	"version": "4.8.1",
+	"version": "4.8.2",
 	"description": "Experimentation and Event Tracking Toolkit",
 	"main": "framework.js",
 	"keywords": [],
