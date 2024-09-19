@@ -13,6 +13,7 @@ const ra_trackers = function (logger, config) {
 				name: variationName
 			}
 		},
+		unique_key,
 		eventTracker: event_tracker,
 		intersectionObserver: intersection_observer
 	} = config;
@@ -197,7 +198,11 @@ const ra_trackers = function (logger, config) {
 				if (document.readyState === "complete") resolve(); else window.addEventListener("load", resolve, false);
 			});
 
-			const experimentLoaded = new Promise(resolve => window.addEventListener("raExperimentLoaded", resolve, false));
+			logger.log("setting unique event listener: ", `raExperimentLoaded-${unique_key}`);
+
+			const experimentLoaded = new Promise(resolve => window.addEventListener(`raExperimentLoaded-${unique_key}`, resolve, {
+				once: true
+			}));
 
 			Promise.all([windowLoaded, experimentLoaded]).then(() => {
 				//
@@ -215,7 +220,7 @@ const ra_trackers = function (logger, config) {
 					}
 				} else logger.warn("trackers: track: event tracking disabled");
 				//
-				if ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) setSwipeEvents();
+				// if ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) setSwipeEvents();
 				//
 				if (intersection_observer && intersection_observer.active && intersection_observer.elements.length) {
 					intersection_observer.elements.forEach(element => observeIntersections({
