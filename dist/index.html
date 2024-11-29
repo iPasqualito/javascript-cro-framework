@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+	<title>recoveryArea Framework Test Page</title>
+  <script type="module" crossorigin src="/framework.js"></script>
+  <link rel="stylesheet" crossorigin href="/style.css">
+</head>
+<body class="awesome">
+<div class="container">
+	<h1 data-test="remove_me">recoveryArea Framework 4.8.3</h1>
+	<div class="ra-frw-new-features">
+		<ul class="ra-frw-new-features-list">
+			<li>Simplified Tracking</li>
+			<li>Third Party Tools easier to use</li>
+			<li>Support for both GA3 / GA4</li>
+			<li>GA4 Event tracking default</li>
+			<li>Prevent Experiment from running Twice</li>
+		</ul></div>
+	<button><span>Click me to add a class to the banner</span></button>
+	<div class="slider">
+		<div class="slides">
+			<div class="slide" id="slide-1">
+				<span>1</span>
+			</div>
+			<div class="slide" id="slide-2">
+				<span>2</span>
+			</div>
+			<div class="slide" id="slide-3">
+				<span>3</span>
+			</div>
+			<div class="slide" id="slide-4">
+				<span>4</span>
+			</div>
+			<div class="slide" id="slide-5">
+				<span>5</span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="banner">
+	<p>This one gets picked up by the intersection observer...</p>
+</div>
+
+<script>
+
+	setTimeout(() => {
+		const pick_me_up_later = document.createElement("div");
+
+		pick_me_up_later.classList.add("ra-pick-me-up");
+		pick_me_up_later.setAttribute("style", "display: block;background-color: white;margin: 50px;box-sizing: border-box;border: 2px solid green;width: 500px;height: 500px;");
+
+		document.querySelector(".banner").insertAdjacentElement("beforebegin", pick_me_up_later);
+	}, 2000);
+
+</script>
+</body>
+</html>
