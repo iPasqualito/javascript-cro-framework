@@ -1,21 +1,34 @@
 {
-  "name": "javascript-vite-framework",
-  "private": true,
-  "version": "5.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "format": "prettier --write ."
-  },
-  "devDependencies": {
-    "eslint": "^9.15.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "prettier": "^3.4.1",
-    "sass": "^1.81.0",
-    "vite": "^6.0.1"
-  }
+	"name": "javascript-cro-framework",
+	"private": true,
+	"version": "5.0.0",
+	"description": "Experimentation and Event Tracking Toolkit",
+	"author": {
+		"name": "Pascal Louwes",
+		"email": "pascal@recoveryarea.nl",
+		"url": "https://www.recoveryarea.nl/"
+	},
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/iPasqualito/javascript-cro-framework"
+	},
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"clean": "rm dist/*",
+		"clean-build": "npm run clean && npm run build",
+		"preview": "vite preview",
+		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"eslint": "^9.15.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"prettier": "^3.4.1",
+		"sass": "^1.81.0",
+		"vite": "^6.0.1"
+	}
 }
