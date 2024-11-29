@@ -18,7 +18,8 @@
 		eventTracker: {
 			ga_version: 4,
 			active: true,
-			elements: [{
+			elements: [
+				{
 				selector: ".container button",
 				tag: "container button",
 				throttle: 0,
@@ -27,7 +28,8 @@
 				selector: ".slider .slide",
 				tag: "slider slide",
 				events: ["swiped-left"]
-			}]
+			}
+			]
 		},
 		intersectionObserver: {
 			active: true,
@@ -41,7 +43,13 @@
 	const framework = new ra_framework(config);
 
 	framework.init(() => {
+
 		const changeDom = (element) => {
+
+			d.body.addEventListener("click", (event) => {
+				if (event.target.matches("button")) framework.sendDimension("button", true, 4);
+			})
+
 
 			framework.logger.log("element loaded", element);
 
@@ -120,7 +128,7 @@
 		}, element => {
 			if (d.body.classList.contains("ra-001-frw")) return;
 			changeDom(element);
-			trigger_third_party_tools();
+			//trigger_third_party_tools();
 			d.body.classList.add("ra-001-frw");
 			framework.logger.log("dispatching unique event: ", `raExperimentLoaded-${config.unique_key}`);
 			w.dispatchEvent(new Event(`raExperimentLoaded-${config.unique_key}`)); // tell tracker experiment code has run

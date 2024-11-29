@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/javascript-cro-framework.iml" filepath="$PROJECT_DIR$/.idea/javascript-cro-framework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/javascript-vite-framework.iml" filepath="$PROJECT_DIR$/.idea/javascript-vite-framework.iml" />
     </modules>
   </component>
 </project>
