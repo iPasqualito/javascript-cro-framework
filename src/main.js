@@ -21,7 +21,7 @@ window.ra_framework = function(config) {
 		init: callback => {
 			try {
 				logger.info('framework: init: start', {
-					version: '4.8.3.1', ...config
+					version: '5.0', ...config
 				})
 				trackers.track(google_analytics_version)
 				if (config.pageLoad.active && Function(config.pageLoad.condition)) trackers.sendDimension(config.pageLoad.tag || 'PageLoad Event', true, google_analytics_version)
